@@ -46,6 +46,7 @@ public class ProductServicesImpl implements ProductService{
        ProductToUpdate.setDescription(updatedProduct.getDescription());
        ProductToUpdate.setPrice(updatedProduct.getPrice());
        ProductToUpdate.setCategory(updatedProduct.getCategory());
+       ProductToUpdate.setMaterials(updatedProduct.getMaterials());
        return productRepository.save(ProductToUpdate);
     }
 
@@ -69,12 +70,12 @@ public class ProductServicesImpl implements ProductService{
         final Product exisitingProduct = getProductById(productId);
         final FileData existingImage = fileService.getFileDataById(imageId);
 
-        if(!exisitingProduct.getFiles().contains(existingImage))
+        if(!exisitingProduct.getFilesProduct().contains(existingImage))
         {
             throw new IllegalStateException(String.format("The Image with ID : %d  does not belong to this product", imageId));
         }
 
-        exisitingProduct.getFiles().remove(existingImage);
+        exisitingProduct.getFilesProduct().remove(existingImage);
         existingImage.setProduct(null);
         fileService.deleteFileFromFileSystem(existingImage);
         productRepository.save(exisitingProduct);
@@ -85,11 +86,11 @@ public class ProductServicesImpl implements ProductService{
     public  ResponseEntity<byte[]> fetchImageFromProduct(final long productId,final int fileIndex) throws IOException {
 
         final Product product = getProductById(productId);
-        if(fileIndex >= product.getFiles().size())
+        if(fileIndex >= product.getFilesProduct().size())
         {
             throw new IllegalStateException("The file index is out of range.");
         }
-        final FileData fileData = product.getFiles().get(fileIndex);
+        final FileData fileData = product.getFilesProduct().get(fileIndex);
         return fileService.downloadFile(fileData);
     }
 

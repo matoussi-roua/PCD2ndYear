@@ -2,7 +2,9 @@ package PCD.BACKEND.RECRAFTMARKET.model.user;
 
 
 
-import PCD.BACKEND.RECRAFTMARKET.model.file.FileData;
+
+import PCD.BACKEND.RECRAFTMARKET.model.file.FileDataUser;
+import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
 import PCD.BACKEND.RECRAFTMARKET.model.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -36,8 +38,7 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "phone")
     private Number phonenumber;
-    @Column(name = "materials")
-    private String materials;
+
     @Column(name = "address")
     private String address;
     @Column(name = "points")
@@ -47,13 +48,13 @@ public class UserEntity implements UserDetails {
     private Role role ;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idFile", referencedColumnName = "id")
-    private FileData imageUser;
+    @JoinColumn(name = "idFileUser", referencedColumnName = "id")
+    private FileDataUser fileUser;
 
 
 
 
-     /*
+
 
     @OneToMany(mappedBy = "publisher")
     @JsonIgnore
@@ -61,14 +62,14 @@ public class UserEntity implements UserDetails {
 
 
     @ManyToMany
-    @JoinTable(name = "likesList", joinColumns = @JoinColumn(name = "idClient"), inverseJoinColumns = @JoinColumn(name = "idProduct"))
+    @JoinTable(name = "likesList", joinColumns = @JoinColumn(name = "idUserEntity"), inverseJoinColumns = @JoinColumn(name = "idProduct"))
     @JsonIgnore
     private List<Product> LikedProducts ;
 
     @ManyToMany
-    @JoinTable(name = "favouriteList", joinColumns = @JoinColumn(name = "idClient"), inverseJoinColumns = @JoinColumn(name = "idProduct"))
+    @JoinTable(name = "favouriteList", joinColumns = @JoinColumn(name = "idUserEntity"), inverseJoinColumns = @JoinColumn(name = "idProduct"))
     @JsonIgnore
-    private List<Product> favouriteProducts ;*/
+    private List<Product> favouriteProducts ;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

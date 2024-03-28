@@ -20,7 +20,6 @@ public class RegisterDto {
     
     private Number phonenumber;
 
-    private String materials;
 
     private String address;
 

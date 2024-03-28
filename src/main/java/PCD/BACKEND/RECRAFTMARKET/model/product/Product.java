@@ -1,6 +1,7 @@
 package PCD.BACKEND.RECRAFTMARKET.model.product;
 
 import PCD.BACKEND.RECRAFTMARKET.model.file.FileData;
+import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,6 +29,7 @@ public class Product {
     private Number shopPoints; 
     private Number points; //number of likes number of comments number of wish list number + shopPoints
     private boolean isDone; // the product is sold or not
+    private String materials;
    // @ElementCollection(fetch = FetchType.LAZY)
     @OneToMany(mappedBy = "commentProduct")
     @JsonIgnore
@@ -36,21 +38,21 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     @JsonIgnore
-    private List<FileData> files;
+    private List<FileData> filesProduct;
 
-    /*@ManyToOne
-    @JoinColumn(name="idClient")
+    @ManyToOne
+    @JoinColumn(name="idUser")
     @JsonIgnore
-    private Client publisher;
+    private UserEntity publisher;
 
 
-    @ManyToMany(mappedBy = "LikedPosts")
+    @ManyToMany(mappedBy = "LikedProducts")
     @JsonIgnore
-    private List<Client> loversList;
+    private List<UserEntity> loversList;
 
-    @ManyToMany(mappedBy = "favouritePosts")
+    @ManyToMany(mappedBy = "favouriteProducts")
     @JsonIgnore
-    private List<Client> wantersList ;*/
+    private List<UserEntity> wantersList ;
 /*
     @Override
     public int hashCode() {
