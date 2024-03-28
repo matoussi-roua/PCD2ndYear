@@ -53,7 +53,6 @@ private RoleRepository roleRepository;
         user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
         user.setRole(role);
         user.setAddress(registerDto.getAddress());
-        user.setMaterials(registerDto.getMaterials());
         user.setPhonenumber(registerDto.getPhonenumber());
         user.setPoints(0);
 

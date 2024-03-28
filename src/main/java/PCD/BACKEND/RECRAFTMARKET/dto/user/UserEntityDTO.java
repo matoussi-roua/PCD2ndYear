@@ -14,8 +14,9 @@ public record UserEntityDTO (
         UUID id,
         String username,
         Role role,
+
        // Number phoneNumber,
-        String materials,
+
         String address,
         Number points
 

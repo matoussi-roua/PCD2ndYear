@@ -1,30 +1,30 @@
 package PCD.BACKEND.RECRAFTMARKET.model.file;
 
 import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
+import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
-@Builder
-@AllArgsConstructor
 @Data
 @Entity
-@Table(name = "Product_files")
-public class FileData {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Table(name = "User_files")
+public class FileDataUser {
 
         @SequenceGenerator(
-                name = "file_product_sequence",
-                sequenceName = "file_product_sequence",
+                name = "file_user_sequence",
+                sequenceName = "file_user_sequence",
                 allocationSize = 1
         )
 
         @Id
         @GeneratedValue(
                 strategy = GenerationType.SEQUENCE,
-                generator = "file_product_sequence"
+                generator = "file_user_sequence"
         )
         @Column(name = "id")
         private long id;
@@ -35,8 +35,9 @@ public class FileData {
         @Column(name ="file_path")
         private String filePath;
 
-        @ManyToOne(cascade = CascadeType.REMOVE)
-        @JoinColumn(name = "idProduct")
-        private Product product;
 
-    }
+        @OneToOne
+        @JoinColumn(name = "idUser", referencedColumnName = "id")
+        private UserEntity userFile;
+
+}

@@ -14,7 +14,6 @@ public class UserEntityDTOMapper implements Function<UserEntity, UserEntityDTO> 
                 userEntity.getId(),
                 userEntity.getUsername(),
                 userEntity.getRole(),
-                userEntity.getMaterials(),
                 userEntity.getAddress(),
                 userEntity.getPoints()
 
