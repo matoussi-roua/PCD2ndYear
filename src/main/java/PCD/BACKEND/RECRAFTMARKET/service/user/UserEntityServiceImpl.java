@@ -5,6 +5,7 @@ import PCD.BACKEND.RECRAFTMARKET.dto.user.UserEntityDTO;
 import PCD.BACKEND.RECRAFTMARKET.dto.user.UserEntityDTOMapper;
 import PCD.BACKEND.RECRAFTMARKET.exceptions.ResourceNotFoundException;
 import PCD.BACKEND.RECRAFTMARKET.model.file.FileDataUser;
+import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
 import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
 import PCD.BACKEND.RECRAFTMARKET.repository.UserEntityRepository;
 import PCD.BACKEND.RECRAFTMARKET.security.utility.ResponseHandler;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -29,37 +29,43 @@ public class UserEntityServiceImpl implements UserEntityService{
     private final UserEntityRepository userEntityRepository;
     private final UserEntityDTOMapper userEntityDTOMapper;
     private final FileServiceUser fileService;
-@Override
-     public ResponseEntity<Object> getUserEntityByUsername(final String username)
-     {
-         final UserEntity user= userEntityRepository.fetchUserWithUsername(username)
-                .orElseThrow(()-> new ResourceNotFoundException(String.format("The user with username : %s could not be found.", username)));
-         final UserEntityDTO userdto=userEntityDTOMapper.apply(user);
-         return ResponseHandler.generateResponse(userdto , HttpStatus.OK) ;
-     }
-    @Override
-    public ResponseEntity<Object> getUserEntityById(UUID idUserEntity) {
-        final UserEntity currentUser = userEntityRepository.findById(idUserEntity).get();
-        final UserEntityDTO user = userEntityDTOMapper.apply(currentUser);
-        return ResponseHandler.generateResponse(user , HttpStatus.OK);
 
-    }
     @Override
-    public ResponseEntity<Object> updateUserEntity(UUID idUserEntity, UserEntity userUpdated) {
-        UserEntity userToUpdate= userEntityRepository.findById(idUserEntity).get();
+     public ResponseEntity<Object> fetchUserByUsername(final String username)
+     {
+         final UserEntity savedUser = getUserByUsername(username);
+         final UserEntityDTO user = userEntityDTOMapper.apply(savedUser);
+         return ResponseHandler.generateResponse(user , HttpStatus.OK) ;
+     }
+
+    @Override
+    public ResponseEntity<Object> fetchUserEntityById(UUID UserId) {
+        final UserEntity savedUser = getUserById(UserId);
+        final UserEntityDTO user  = userEntityDTOMapper.apply(savedUser);
+        return ResponseHandler.generateResponse(user,HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> updateUserEntity(UUID UserId, UserEntity userUpdated) {
+        UserEntity userToUpdate = getUserById(UserId);
         userToUpdate.setUsername(userUpdated.getUsername());
         userToUpdate.setPhonenumber(userUpdated.getPhonenumber());
         userToUpdate.setAddress(userUpdated.getAddress());
         userEntityRepository.save(userToUpdate);
-        final String successResponse = String.format("User with ID %d updated successfully", idUserEntity);
+        final String successResponse = String.format("User with ID %d updated successfully", UserId);
 
         return ResponseHandler.generateResponse(successResponse, HttpStatus.OK);
 
     }
     @Override
-    public ResponseEntity<Object> getAllUserEntity() {
+    public List<UserEntityDTO> getAllUserEntity() {
     final List<UserEntityDTO> users =mapToDTOList(userEntityRepository.findAll());
-    return ResponseHandler.generateResponse(users, HttpStatus.OK);
+    return users;
+    }
+    @Override
+    public ResponseEntity<Object> fetchAllUserEntity() {
+        final List<UserEntityDTO> users = getAllUserEntity();
+        return ResponseHandler.generateResponse(users,HttpStatus.OK);
     }
 
     @Override
@@ -72,46 +78,83 @@ public class UserEntityServiceImpl implements UserEntityService{
     {
         return users.stream().map(userEntityDTOMapper).toList();
     }
-    @Override
-    public void deleteUserEntityById(UUID idUserEntity) {
-        userEntityRepository.deleteById(idUserEntity);
-    }
 
-    @Override
-    public void deleteAllUserEntity(List<UserEntity> users) {
-        userEntityRepository.deleteAll(users);
-    }
 
     @Override
     public ResponseEntity<Object> addImageToUser(UUID UserId, @NotNull MultipartFile image) throws IOException {
-        final UserEntity existingUser =  getUserEntityById(UserId);
+        final UserEntity existingUser =  getUserById(UserId);
         final FileDataUser newImage = fileService.processUploadedFile(image);
         newImage.setUserFile(existingUser);
+        existingUser.setFileUser(newImage);
         userEntityRepository.save(existingUser);
         final String successResponse ="The image is added successfully.";
         return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<Object> removeImageFromUser(UUID UserId, long imageId) throws IOException {
-        final UserEntity exisitingUser = getUserEntityById(UserId);
-        final FileDataUser existingImage = fileService.getFileDataUserById(imageId);
-        if(!exisitingUser.getFileUser().contains(existingImage)){
-            throw new IllegalStateException(String.format("The Image with ID : %d  does not belong to this User", imageId));
+    public ResponseEntity<Object> removeImageFromUser(UUID UserId) throws IOException {
+        final UserEntity existingUser = getUserById(UserId);
+        if(existingUser.getFileUser() == null){
+            throw new IllegalStateException("there is no image to delete");
         }
-        exisitingUser.getFileUser().remove(existingImage);
+        
+        final FileDataUser existingImage = fileService.getFileDataUserById(existingUser.getFileUser().getId());
+    
+        existingUser.setFileUser(null);
         existingImage.setUserFile(null);
         fileService.deleteFileFromFileSystemUser(existingImage);
-        userEntityRepository.save(exisitingUser);
-        final String successResponse = String.format("The image with ID : %d deleted successfully",imageId);
+        userEntityRepository.save(existingUser);
+        final String successResponse = String.format("The image with ID : %d deleted successfully",existingImage.getId());
         return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
     }
 
     @Override
     public  ResponseEntity<byte[]> fetchImageFromUser(final UUID UserId) throws IOException {
-        final UserEntity user = getUserEntityById(UserId);
+        final UserEntity user = getUserById(UserId);
         final FileDataUser fileDataUser = user.getFileUser();
         return fileService.downloadFile(fileDataUser);
+    }
+
+    @Override
+    public ResponseEntity<Object> addProductToUser(UUID userId, Product product) {
+        UserEntity user = getUserById(userId);
+
+        // Add product to user's list of products
+        user.getProductsList().add(product);
+        userEntityRepository.save(user);
+
+        return ResponseHandler.generateResponse("Product added to user successfully.", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteProductFromUser(UUID userId, Long productId) {
+        UserEntity user = getUserById(userId);
+        user.getProductsList().removeIf(product -> product.getIdProduct()==productId);
+        userEntityRepository.save(user);
+
+        return ResponseHandler.generateResponse("Product deleted from user successfully.", HttpStatus.OK);
+    }
+
+
+    @Override
+    public ResponseEntity<Object> getAllProductsOfUser(UUID userId) {
+        UserEntity user = getUserById(userId);
+        List<Product> products = user.getProductsList();
+        return ResponseHandler.generateResponse(products, HttpStatus.OK);
+    }
+
+
+    public UserEntity getUserById(final UUID userId) {
+        return userEntityRepository.fetchUserById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("The User with ID %s could not be found in our system.".formatted(userId))
+        );
+    }
+
+    @Override
+    public UserEntity getUserByUsername(String username) {
+        return userEntityRepository.fetchUserWithUsername(username).orElseThrow(
+                () -> new ResourceNotFoundException("The User with USERNAME '%s' could not be found in our system.".formatted(username))
+        );
     }
 
 /*@Override
@@ -272,18 +315,18 @@ public ResponseEntity<byte[]> fetchImageFromUser(UUID UserId) throws IOException
 
     @Override
     public ResponseEntity<Object> removeImageFromArticle(long articleId, long imageId) throws IOException {
-        final Article exisitingArticle = getArticleById(articleId);
+        final Article existingArticle = getArticleById(articleId);
         final FileData existingImage = fileService.getFileDataById(imageId);
 
-        if(!exisitingArticle.getFiles().contains(existingImage))
+        if(!existingArticle.getFiles().contains(existingImage))
         {
             throw new IllegalStateException(String.format("The Image with ID : %d  does not belong to this article", imageId));
         }
 
-        exisitingArticle.getFiles().remove(existingImage);
+        existingArticle.getFiles().remove(existingImage);
         existingImage.setArticle(null);
         fileService.deleteFileFromFileSystem(existingImage);
-        articleRepository.save(exisitingArticle);
+        articleRepository.save(existingArticle);
         final String successResponse = String.format("The image with ID : %d deleted successfully",imageId);
         return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
     }

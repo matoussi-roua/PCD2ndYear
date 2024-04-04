@@ -30,7 +30,9 @@ public class Product {
     private Number points; //number of likes number of comments number of wish list number + shopPoints
     private boolean isDone; // the product is sold or not
     private String materials;
+
    // @ElementCollection(fetch = FetchType.LAZY)
+
     @OneToMany(mappedBy = "commentProduct")
     @JsonIgnore
     private List<Comment> comments ;

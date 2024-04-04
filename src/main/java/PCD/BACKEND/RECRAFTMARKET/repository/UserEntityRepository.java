@@ -19,8 +19,8 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, UUID> {
     @Query(value = "SELECT EXISTS(SELECT U FROM UserEntity U WHERE  U.username = :username) AS RESULT")
     Boolean isUsernameRegistered(@Param("username")String username);
 
-
-
+    @Query(value = "SELECT U FROM UserEntity U WHERE U.id = :id")
+    Optional<UserEntity> fetchUserById(@Param("id") final UUID id);
 
 
 }

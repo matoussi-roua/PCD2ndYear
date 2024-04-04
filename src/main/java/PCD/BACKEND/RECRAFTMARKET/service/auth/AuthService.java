@@ -13,6 +13,7 @@ import PCD.BACKEND.RECRAFTMARKET.repository.RoleRepository;
 import PCD.BACKEND.RECRAFTMARKET.repository.TokenRepository;
 import PCD.BACKEND.RECRAFTMARKET.repository.UserEntityRepository;
 import PCD.BACKEND.RECRAFTMARKET.security.jwt.JWTService;
+import PCD.BACKEND.RECRAFTMARKET.service.user.UserEntityService;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import PCD.BACKEND.RECRAFTMARKET.exceptions.ResourceNotFoundException;
+
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -32,7 +36,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final UserEntityRepository userEntityRepository;
-
+    private final UserEntityService userEntityService;
     private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JWTService jwtService;
@@ -92,6 +96,16 @@ private RoleRepository roleRepository;
         return ResponseEntity.ok(authResponseDto);
     }
 
+    public String logout (UserDetails userDetails){
+        final UserEntity userToLogout = userEntityService.getUserByUsername(userDetails.getUsername());
+        final List<Token> tokens = tokenRepository.fetchAllValidTokenByUserId(userToLogout.getId());
+        for(var t : tokens){
+            t.setExpired(true);
+            t.setRevoked(true);
+        }
+        tokenRepository.saveAll(tokens);
+        return "loged out";
+    }
     private String generateAndSaveToken(UserEntity user) {
         String jwtToken = jwtService.generateToken(user);
         revokeAllUserTokens(user);
