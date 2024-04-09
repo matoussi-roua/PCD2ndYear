@@ -1,5 +1,6 @@
 package PCD.BACKEND.RECRAFTMARKET.service.product;
 
+import PCD.BACKEND.RECRAFTMARKET.exceptions.ResourceNotFoundException;
 import PCD.BACKEND.RECRAFTMARKET.model.file.FileData;
 import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
 import PCD.BACKEND.RECRAFTMARKET.repository.ProductRepository;
@@ -14,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+
 @Service
 public class ProductServicesImpl implements ProductService{
     @Autowired
@@ -22,9 +23,13 @@ public class ProductServicesImpl implements ProductService{
     @Autowired
     private FileService fileService;
 
-
+//    @Override
+//    public Product addProduct(Product product) {
+//        return productRepository.save(product);
+//    }
     @Override
     public Product addProduct(Product product) {
+
         return productRepository.save(product);
     }
 
@@ -50,10 +55,27 @@ public class ProductServicesImpl implements ProductService{
        return productRepository.save(ProductToUpdate);
     }
 
-    @Override
-    public void deleteProduct(long productId) {
-    productRepository.deleteById(productId);
-    }
+  /*  @Override
+    public void deleteProduct(long productId) throws IOException{
+        removeAllImagesFromProduct(productId);
+        productRepository.deleteById(productId);
+    }*/
+  @Override
+  public void deleteProduct(long productId) throws IOException {
+      // Check if the product exists before attempting to delete it
+      if (productRepository.existsById(productId)) {
+          // Remove all images associated with the product
+         removeAllImagesFromProduct(productId);
+
+          // Delete the product from the database
+          //productRepository.deleteById(productId);
+          productRepository.delete(getProductById(productId));
+      } else {
+          // Handle the case where the product does not exist
+          throw new ResourceNotFoundException("Product with ID " + productId + " not found");
+      }
+  }
+
     @Override
     public ResponseEntity<Object> addImageToProduct(long productId, @NotNull MultipartFile image) throws IOException {
         final Product existingProduct =  getProductById(productId);
@@ -64,8 +86,38 @@ public class ProductServicesImpl implements ProductService{
         final String successResponse ="The image is added successfully.";
         return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
     }
-
     @Override
+    public void removeAllImagesFromProduct(long productId) throws IOException {
+        // Step 1: Get the existing product by its ID
+        final Product existingProduct = getProductById(productId);
+
+        if (existingProduct == null) {
+            // Handle the case where the product with the given ID does not exist
+            throw new ResourceNotFoundException("Product with ID " + productId + " not found");
+        }
+
+        // Step 2: Retrieve the list of files associated with the product
+        List<FileData> filesProduct = existingProduct.getFilesProduct();
+
+        // Step 3: Check if the list of files is not empty before proceeding
+        if (!filesProduct.isEmpty()) {
+            // Step 4: Iterate through the list of files and delete each file
+            for (FileData fileData : filesProduct) {
+                fileService.deleteFileFromFileSystem(fileData);
+            }
+
+            // Step 5: Clear the list of files associated with the product
+            filesProduct.clear();
+        } else {
+            // Handle the case where there are no files associated with the product
+            //throw new IllegalStateException("No files associated with product ID " + productId);
+        }
+
+        // Step 6: Save the updated product to the database
+        productRepository.save(existingProduct);
+    }
+
+
     public ResponseEntity<Object> removeImageFromProduct(long productId, long imageId) throws IOException {
         final Product exisitingProduct = getProductById(productId);
         final FileData existingImage = fileService.getFileDataById(imageId);

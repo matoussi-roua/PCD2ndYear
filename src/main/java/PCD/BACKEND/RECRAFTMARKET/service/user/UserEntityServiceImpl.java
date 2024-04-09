@@ -10,10 +10,12 @@ import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
 import PCD.BACKEND.RECRAFTMARKET.repository.UserEntityRepository;
 import PCD.BACKEND.RECRAFTMARKET.security.utility.ResponseHandler;
 import PCD.BACKEND.RECRAFTMARKET.service.file.FileServiceUser;
+import PCD.BACKEND.RECRAFTMARKET.service.product.ProductService;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +31,8 @@ public class UserEntityServiceImpl implements UserEntityService{
     private final UserEntityRepository userEntityRepository;
     private final UserEntityDTOMapper userEntityDTOMapper;
     private final FileServiceUser fileService;
-
+    private final ProductService productService;
+///////////////////////////ALL about User //////////////////////////////////////////////////////////
     @Override
      public ResponseEntity<Object> fetchUserByUsername(final String username)
      {
@@ -48,7 +51,9 @@ public class UserEntityServiceImpl implements UserEntityService{
     @Override
     public ResponseEntity<Object> updateUserEntity(UUID UserId, UserEntity userUpdated) {
         UserEntity userToUpdate = getUserById(UserId);
-        userToUpdate.setUsername(userUpdated.getUsername());
+       // userToUpdate.setPassword(userUpdated.getPassword());
+        userToUpdate.setPoints(userUpdated.getPoints());
+       // userToUpdate.setUsername(userUpdated.getUsername());
         userToUpdate.setPhonenumber(userUpdated.getPhonenumber());
         userToUpdate.setAddress(userUpdated.getAddress());
         userEntityRepository.save(userToUpdate);
@@ -115,10 +120,18 @@ public class UserEntityServiceImpl implements UserEntityService{
         return fileService.downloadFile(fileDataUser);
     }
 
-    @Override
-    public ResponseEntity<Object> addProductToUser(UUID userId, Product product) {
-        UserEntity user = getUserById(userId);
 
+    ////////////////////////////////////ALL about the product ////////////////////////////////////////////
+    @Override
+    public ResponseEntity<Object> addProductToUser(UserDetails userDetails, UUID userId, Product product) {
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+
+        UserEntity user = getUserById(userId);
+        Product productadded=productService.addProduct(product);
+        productadded.setPublisher(user);
         // Add product to user's list of products
         user.getProductsList().add(product);
         userEntityRepository.save(user);
@@ -126,16 +139,76 @@ public class UserEntityServiceImpl implements UserEntityService{
         return ResponseHandler.generateResponse("Product added to user successfully.", HttpStatus.OK);
     }
 
+
     @Override
-    public ResponseEntity<Object> deleteProductFromUser(UUID userId, Long productId) {
-        UserEntity user = getUserById(userId);
-        user.getProductsList().removeIf(product -> product.getIdProduct()==productId);
-        userEntityRepository.save(user);
+    public ResponseEntity<Object> addImageToProductUser(UserDetails userDetails,UUID userId, Long productId, @NotNull MultipartFile image) throws IOException {
 
-        return ResponseHandler.generateResponse("Product deleted from user successfully.", HttpStatus.OK);
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        boolean productFound = currentUser.getProductsList().stream()
+                .anyMatch(product -> product.getIdProduct()==productId);
+        // If productFound is true, add image to product and save the user entity
+        if (productFound) {
+            productService.addImageToProduct(productId,image);
+            //productNoImage.getFilesProduct().add(newImage);
+            userEntityRepository.save(currentUser);
+            return ResponseHandler.generateResponse("image Product added successfully.", HttpStatus.OK);
+        } else {
+            // Product not found, return an error response
+            return ResponseHandler.generateResponse("Product not found for the user.", HttpStatus.NOT_FOUND);
+        }
     }
+    @Override
+    public ResponseEntity<Object> updateProductUser(UserDetails userDetails,UUID userId, Long productId, Product productupdated) {
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
 
+        // Check if any product in the user's list has the provided productId
+        boolean productFound = currentUser.getProductsList().stream()
+                .anyMatch(product -> product.getIdProduct()==productId);
 
+        // If productFound is true, update the product and save the user entity
+        if (productFound) {
+            productService.updateProduct(productId, productupdated);
+            userEntityRepository.save(currentUser);
+            return ResponseHandler.generateResponse("Product updated successfully.", HttpStatus.OK);
+        } else {
+            // Product not found, return an error response
+            return ResponseHandler.generateResponse("Product not found for the user.", HttpStatus.NOT_FOUND);
+        }
+    }
+    @Override
+    public ResponseEntity<Object> deleteProductFromUser(UserDetails userDetails,UUID userId, Long productId) throws IOException {
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        // Check if any product in the user's list has the provided productId
+        boolean productFound = currentUser.getProductsList().stream()
+                .anyMatch(product -> product.getIdProduct() == productId);
+        // If productFound is true, update the product and save the user entity
+        if (productFound) {
+            productService.deleteProduct(productId);//the problem is here
+            //userEntityRepository.save(currentUser); here is the problem :{
+            //    "timestamp": "2024-04-08T17:03:49.1732377",
+            //    "status": "BAD_REQUEST",
+            //    "message": "Other exception occurs",
+            //    "errors": [
+            //        "Unable to find PCD.BACKEND.RECRAFTMARKET.model.product.Product with id 252"
+            //    ]
+            //}
+            return ResponseHandler.generateResponse("Product deleted successfully.", HttpStatus.OK);
+        }
+        else {
+            // Product not found, return an error response
+            return ResponseHandler.generateResponse("Product not found for the user.", HttpStatus.NOT_FOUND);
+        }
+
+    }
     @Override
     public ResponseEntity<Object> getAllProductsOfUser(UUID userId) {
         UserEntity user = getUserById(userId);
@@ -143,6 +216,119 @@ public class UserEntityServiceImpl implements UserEntityService{
         return ResponseHandler.generateResponse(products, HttpStatus.OK);
     }
 
+
+//////////////////////////////// Likes List ///////////////////////////////////////////
+@Override
+public ResponseEntity<Object> getAllLikesListOfUser(UserDetails userDetails, UUID userId) throws IOException {
+        //make sure the id of user is really his id
+    final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+    if (!currentUser.getId().equals(userId)) {
+        return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+    }
+    List<Product> likesList=currentUser.getLikedProducts();
+    return ResponseHandler.generateResponse(likesList, HttpStatus.OK);
+}
+
+    @Override
+    public ResponseEntity<Object> addProductToLikesListUser(UserDetails userDetails, UUID userId, Long productId) throws IOException {
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        final Product likedProduct =productService.getProductById(productId);
+        currentUser.getLikedProducts().add(likedProduct);
+        likedProduct.getLoversList().add(currentUser);
+        // Add product to user's list of products
+        userEntityRepository.save(currentUser);
+        return ResponseHandler.generateResponse("Product added to likes list successfully.", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteFromLikesListUser(UserDetails userDetails, UUID userId, Long productId) throws IOException {
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        // Get the liked product
+        final Product likedProduct = productService.getProductById(productId);
+
+        // Remove product from user's likes list
+        boolean removedFromLikes = currentUser.getLikedProducts().remove(likedProduct);
+
+        if (!removedFromLikes) {
+            return ResponseHandler.generateResponse("Product is not in user's likes list.", HttpStatus.BAD_REQUEST);
+        }
+
+        // Remove user from product's lovers list
+        likedProduct.getLoversList().remove(currentUser);
+
+        // Save changes to the database
+        try {
+            userEntityRepository.save(currentUser);
+            return ResponseHandler.generateResponse("Product removed from likes list successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse("Failed to remove product from likes list.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+//////////////////////////// Favourite List//////////////////////////////////////////////////
+@Override
+public ResponseEntity<Object> getAllFavouriteListOfUser(UserDetails userDetails, UUID userId) throws IOException {
+    final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+    if (!currentUser.getId().equals(userId)) {
+        return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+    }
+    List<Product> favouriteListList=currentUser.getFavouriteProducts();
+    return ResponseHandler.generateResponse(favouriteListList, HttpStatus.OK);
+}
+
+    @Override
+    public ResponseEntity<Object> addProductToFavouriteListUser(UserDetails userDetails, UUID userId, Long productId) throws IOException {
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        final Product favouriteProduct =productService.getProductById(productId);
+        currentUser.getFavouriteProducts().add(favouriteProduct);
+        favouriteProduct.getWantersList().add(currentUser);
+        // Add product to user's list of products
+        try {
+            userEntityRepository.save(currentUser);
+            return ResponseHandler.generateResponse("Product removed from likes successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse("Failed to remove product from likes list.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }   }
+
+    @Override
+    public ResponseEntity<Object> deleteFromFavouriteListUser(UserDetails userDetails, UUID userId, Long productId) throws IOException {
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        // Get the liked product
+        final Product favouriteProduct = productService.getProductById(productId);
+
+        // Remove product from user's likes list
+        boolean removedFromFavourite = currentUser.getFavouriteProducts().remove(favouriteProduct);
+
+        if (!removedFromFavourite) {
+            return ResponseHandler.generateResponse("Product is not in user's favourite list.", HttpStatus.BAD_REQUEST);
+        }
+
+        // Remove user from product's lovers list
+        favouriteProduct.getWantersList().remove(currentUser);
+
+        // Save changes to the database
+        try {
+            userEntityRepository.save(currentUser);
+            return ResponseHandler.generateResponse("Product removed from favourite successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseHandler.generateResponse("Failed to remove product from favourite list.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public UserEntity getUserById(final UUID userId) {
         return userEntityRepository.fetchUserById(userId).orElseThrow(
@@ -157,228 +343,8 @@ public class UserEntityServiceImpl implements UserEntityService{
         );
     }
 
-/*@Override
-public ResponseEntity<Object> addImageToUser(UUID UserId, @NotNull MultipartFile image) throws IOException {
-    // Fetch the existing user entity
-    final UserEntity existingUser = getUserEntityById(UserId);
-
-    // Process the uploaded file
-    final FileDataUser newImage = fileService.processUploadedFile(image);
-
-    // Associate the file with the user
-    newImage.setUserFile(existingUser);
-
-    // Save the user entity
-    userEntityRepository.save(existingUser);
-
-    final String successResponse ="The image is added successfully.";
-    return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
-}
-
-@Override
-public ResponseEntity<Object> removeImageFromUser(UUID UserId, long imageId) throws IOException {
-    // Fetch the existing user entity
-    final UserEntity existingUser = getUserEntityById(UserId);
-
-    // Fetch the existing image file
-    final FileDataUser existingImage = fileService.getFileDataUserById(imageId);
-
-    // Check if the image belongs to the user
-    if (!existingUser.getFileUser().contains(existingImage)) {
-        throw new IllegalStateException(String.format("The Image with ID : %d does not belong to this User", imageId));
-    }
-
-    // Remove the image from the user's list of files
-    existingUser.getFileUser().remove(existingImage);
-
-    // Unset the user association from the image
-    existingImage.setUserFile(null);
-
-    // Delete the image file from the file system
-    fileService.deleteFileFromFileSystemUser(existingImage);
-
-    // Save the user entity
-    userEntityRepository.save(existingUser);
-
-    final String successResponse = String.format("The image with ID : %d deleted successfully", imageId);
-    return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
-}
-
-@Override
-public ResponseEntity<byte[]> fetchImageFromUser(UUID UserId) throws IOException {
-    // Fetch the existing user entity
-    final UserEntity user = getUserEntityById(UserId);
-
-    // Fetch the image file associated with the user
-    final FileDataUser fileDataUser = user.getFilesUser();
-
-    // Download the file and return its byte array
-    return fileService.downloadFile(fileDataUser);
-}
-*/
 
 
 
-
-
-    
-    
-/*
- private UUID id;
-
-    @Column(name ="username" , unique = true , nullable = false)
-    private String username;
-
-    @Column(name = "password" , nullable = false)
-    private String password;
-
-    @Column(name = "phone")
-    private Number phonenumber;
-    @Column(name = "materials")
-    private String materials;
-    @Column(name = "address")
-    private String address;
-    @Column(name = "points")
-    private Number points;
-    private final ArticleRepository articleRepository;
-    private final ArticleDTOMapper articleDTOMapper;
-    private final FileService fileService;
-
-    @Override
-    public ResponseEntity<Object> fetchArticleById(final long articleId) {
-        final Article currentArticle = getArticleById(articleId);
-        final ArticleDTO article = articleDTOMapper.apply(currentArticle);
-        return ResponseHandler.generateResponse(article , HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<Object> updateArticleById(final long articleId, @NotNull String articleJson) throws IOException {
-
-        final Article existingArticle  = getArticleById(articleId);
-        final Article updatedArticle = new ObjectMapper().readValue(articleJson , Article.class);
-
-        var updatedChapters = updatedArticle.getChapters();
-        var updatedDetails = updatedArticle.getDetails();
-
-        existingArticle.setTitle(updatedArticle.getTitle());
-        existingArticle.setPrice(updatedArticle.getPrice());
-        existingArticle.setQuantity(updatedArticle.getQuantity());
-        existingArticle.setReference(updatedArticle.getReference());
-        existingArticle.setLayoutDescription(updatedArticle.getLayoutDescription());
-
-        chapterService.deleteAllChapters(existingArticle.getChapters());
-        detailService.deleteAllDetails(existingArticle.getDetails());
-
-        for(var updatedChapter : updatedChapters)
-        {
-            updatedChapter.setArticle(existingArticle);
-        }
-        existingArticle.setChapters(updatedChapters);
-        for(var updatedDetail : updatedDetails)
-        {
-            updatedDetail.setArticle(existingArticle);
-        }
-        existingArticle.setDetails(updatedDetails);
-
-
-
-        articleRepository.save(existingArticle);
-
-
-        final String successResponse = String.format("Article with ID %d updated successfully", articleId);
-        return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<Object> deleteArticleById(long articleId) throws IOException {
-        final Article existingArticle = getArticleById(articleId);
-
-        chapterService.deleteAllChapters(existingArticle.getChapters());
-        detailService.deleteAllDetails(existingArticle.getDetails());
-        fileService.deleteAllFiles(existingArticle.getFiles());
-        articleRepository.deleteArticleById(articleId);
-
-        final String successResponse = String.format("Article with ID %d deleted successfully", articleId);
-        return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<Object> addImageToArticle(long articleId, @NotNull MultipartFile image) throws IOException {
-        final Article existingArticle =  getArticleById(articleId);
-        final FileData newImage = fileService.processUploadedFile(image);
-        newImage.setArticle(existingArticle);
-        articleRepository.save(existingArticle);
-
-        final String successResponse ="The image is added successfully.";
-        return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<Object> removeImageFromArticle(long articleId, long imageId) throws IOException {
-        final Article existingArticle = getArticleById(articleId);
-        final FileData existingImage = fileService.getFileDataById(imageId);
-
-        if(!existingArticle.getFiles().contains(existingImage))
-        {
-            throw new IllegalStateException(String.format("The Image with ID : %d  does not belong to this article", imageId));
-        }
-
-        existingArticle.getFiles().remove(existingImage);
-        existingImage.setArticle(null);
-        fileService.deleteFileFromFileSystem(existingImage);
-        articleRepository.save(existingArticle);
-        final String successResponse = String.format("The image with ID : %d deleted successfully",imageId);
-        return ResponseHandler.generateResponse(successResponse , HttpStatus.OK);
-    }
-    @Override
-    public  ResponseEntity<byte[]> fetchImageFromArticle(final long articleId,final int fileIndex) throws IOException {
-
-        final Article article = getArticleById(articleId);
-        if(fileIndex >= article.getFiles().size())
-        {
-            throw new IllegalStateException("The file index is out of range.");
-        }
-        final FileData fileData = article.getFiles().get(fileIndex);
-        return fileService.downloadFile(fileData);
-    }
-
-
-    @Override
-    public ResponseEntity<Object> fetchAllArticle(final long pageNumber) {
-        final Pageable pageable = PageRequest.of((int) pageNumber - 1, 10);
-
-        final List<ArticleDTO> articles = articleRepository.fetchAllArticles(pageable).stream().map(articleDTOMapper).toList();
-        if(articles.isEmpty() && pageNumber > 1)
-        {
-            return fetchAllArticle(1);
-        }
-        final long total  = articleRepository.getTotalArticleCount();
-        return ResponseHandler.generateResponse(articles , HttpStatus.OK , articles.size() , total);
-    }
-
-    @Override
-    public void deleteAllArticles(List<Article> articles) {
-        articleRepository.deleteAllArticles(articles);
-    }
-
-    @Override
-    public ArticleDTO mapToDTOItem(Article article) {
-        return articleDTOMapper.apply(article);
-    }
-
-    @Override
-    public List<ArticleDTO> mapToDTOList(List<Article> articles)
-    {
-        return articles.stream().map(articleDTOMapper).toList();
-    }
-
-    @Override
-    public Article getArticleById(final long articleId)
-    {
-        return articleRepository.fetchArticleById(articleId).orElseThrow(
-                () -> new ResourceNotFoundException(String.format("The Article with ID : %d could not be found in our system", articleId))
-        );
-    }
-}*/
 
 }
