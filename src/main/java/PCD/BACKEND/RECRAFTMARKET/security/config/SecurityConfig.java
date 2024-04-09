@@ -47,7 +47,11 @@ public class SecurityConfig {
 
                 .authorizeRequests()
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/test/**").permitAll()
+                .requestMatchers("/api/v2/users/**").permitAll()
+
+                .requestMatchers("/api/v3/products/**").permitAll()
+
+                .requestMatchers("/api/v1/test/**").hasAuthority("CLIENT")
 
                 .anyRequest().authenticated()
 
@@ -62,7 +66,7 @@ public class SecurityConfig {
 
                 .and()
                 .logout()
-                .logoutUrl("/api/v1/auth/logout")
+                .logoutUrl("/api/v1/auth/logout1")
                 .addLogoutHandler(logoutHandler)
                 .logoutSuccessHandler(
                         (request, response, authentication) ->

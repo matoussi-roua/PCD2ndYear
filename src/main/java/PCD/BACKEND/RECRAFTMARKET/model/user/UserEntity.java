@@ -52,10 +52,6 @@ public class UserEntity implements UserDetails {
     private FileDataUser fileUser;
 
 
-
-
-
-
     @OneToMany(mappedBy = "publisher")
     @JsonIgnore
     private List<Product> productsList ;

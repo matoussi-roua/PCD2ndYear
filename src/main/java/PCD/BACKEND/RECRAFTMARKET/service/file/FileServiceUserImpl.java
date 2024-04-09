@@ -64,7 +64,10 @@ public class FileServiceUserImpl implements FileServiceUser{
         file.transferTo(new File(filePath));
         return fileDataUser;
     }
-
+    /*the downloadFile method retrieves the content of a file specified by the fileDataUser,
+    prepares the necessary HTTP headers to indicate how the file should be handled by the client,
+    and creates a ResponseEntity object containing the file content and headers to be returned as
+    the HTTP response. This allows clients to download the file from the server.*/
     @Override
     public ResponseEntity<byte[]> downloadFile(@NotNull final  FileDataUser fileDataUser) throws IOException {
         final String filePath = fileDataUser.getFilePath();

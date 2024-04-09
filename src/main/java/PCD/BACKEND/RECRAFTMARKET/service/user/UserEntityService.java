@@ -1,32 +1,64 @@
 package PCD.BACKEND.RECRAFTMARKET.service.user;
 
 import PCD.BACKEND.RECRAFTMARKET.dto.user.UserEntityDTO;
+import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
 import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 public interface UserEntityService {
-    public ResponseEntity<Object> getUserEntityByUsername(final String username);
-    public ResponseEntity<Object> getUserEntityById(UUID idUserEntity);
+    //////////////////////all about user /////////////////////////////////////////////////////////////
+    public ResponseEntity<Object> fetchUserByUsername(final String username);
+    public ResponseEntity<Object> fetchUserEntityById(UUID idUserEntity);
+
+    ResponseEntity<Object> fetchAllUserEntity();
 
     UserEntityDTO mapToDTOItem(UserEntity user);
 
     List<UserEntityDTO> mapToDTOList(List<UserEntity> users);
 
-    public void deleteUserEntityById(UUID  idUserEntity ) ;
     public ResponseEntity<Object> updateUserEntity(UUID  idUserEntity,UserEntity userUpdated);
-    public ResponseEntity<Object> getAllUserEntity();
+    public List<UserEntityDTO> getAllUserEntity();
 
-    void deleteAllUserEntity(List<UserEntity> users);
+
     public ResponseEntity<Object> addImageToUser(UUID UserId, @NotNull MultipartFile image) throws IOException;
-    public ResponseEntity<Object> removeImageFromUser(UUID UserId, long imageId) throws IOException;
+    public ResponseEntity<Object> removeImageFromUser(UUID UserId ) throws IOException;
     public  ResponseEntity<byte[]> fetchImageFromUser(final UUID UserId) throws IOException;
 
+////////////////////// all about products ///////////////////////////////////////////////////
+    public ResponseEntity<Object> addProductToUser(UserDetails userDetails, UUID userId, Product product);
+
+    ResponseEntity<Object> addImageToProductUser(UserDetails userDetails,UUID userId, Long productId, @NotNull MultipartFile image) throws IOException;
+
+    ResponseEntity<Object> updateProductUser(UserDetails userDetails,UUID userId, Long productId, Product productupdated);
+
+    public ResponseEntity<Object> deleteProductFromUser(UserDetails userDetails,UUID userId, Long productId)throws IOException;
+
+    public ResponseEntity<Object> getAllProductsOfUser(UUID userId);
+
+
+    UserEntity getUserByUsername(String username);
+//////////////////////////////Likes List//////////////////////////////////////////////////
+    ResponseEntity<Object> getAllLikesListOfUser(UserDetails userDetails, UUID userId)throws IOException;
+
+    ResponseEntity<Object> addProductToLikesListUser(UserDetails userDetails, UUID userId, Long productId)throws IOException;
+
+    ResponseEntity<Object> deleteFromLikesListUser(UserDetails userDetails, UUID userId, Long productId)throws IOException;
+
+
+    /////////////////////////////favourite List //////////////////////////////////////////
+
+    ResponseEntity<Object> getAllFavouriteListOfUser(UserDetails userDetails, UUID userId)throws IOException;
+
+    ResponseEntity<Object> addProductToFavouriteListUser(UserDetails userDetails, UUID userId, Long productId)throws IOException;
+
+    ResponseEntity<Object> deleteFromFavouriteListUser(UserDetails userDetails, UUID userId, Long productId)throws IOException;
+    /////////////////////////////////////////////////////////////////////////////////////////
 }

@@ -4,12 +4,15 @@ import PCD.BACKEND.RECRAFTMARKET.dto.auth.AuthResponseDto;
 import PCD.BACKEND.RECRAFTMARKET.dto.auth.LoginDto;
 import PCD.BACKEND.RECRAFTMARKET.dto.auth.RegisterDto;
 import PCD.BACKEND.RECRAFTMARKET.service.auth.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
 //handel http request for login and register
 @RestController
 @RequestMapping("api/v1/auth")
@@ -37,6 +40,14 @@ public class AuthController {
     {
         return authService.login(loginDto);
     }
+//this method of authentication
+@GetMapping("/logout1")
+public String logout (@AuthenticationPrincipal UserDetails userDetails){
+
+    return authService.logout(userDetails);
+}
+
+        // Additional logic in your controller method, if needed
+    }
 //The AuthService performs actions like checking credentials,
 //generating tokens, and handling authentication.
-}

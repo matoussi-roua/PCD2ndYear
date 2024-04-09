@@ -25,8 +25,11 @@ public interface ProductService {
     Product updateProduct(long productId, Product updatedProduct);
 
     // Method to delete a product by its ID
-    void deleteProduct(long productId);
+    void deleteProduct(long productId)throws IOException;
     public ResponseEntity<Object> addImageToProduct(long productId, @NotNull MultipartFile image) throws IOException;
+
+    void removeAllImagesFromProduct(long productId) throws IOException;
+
     public ResponseEntity<Object> removeImageFromProduct(long productId, long imageId) throws IOException;
     public  ResponseEntity<byte[]> fetchImageFromProduct(final long productId,final int fileIndex) throws IOException;
 
