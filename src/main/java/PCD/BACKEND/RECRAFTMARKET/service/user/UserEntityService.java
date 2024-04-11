@@ -1,6 +1,7 @@
 package PCD.BACKEND.RECRAFTMARKET.service.user;
 
 import PCD.BACKEND.RECRAFTMARKET.dto.user.UserEntityDTO;
+import PCD.BACKEND.RECRAFTMARKET.model.product.Comment;
 import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
 import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
 
@@ -24,13 +25,13 @@ public interface UserEntityService {
 
     List<UserEntityDTO> mapToDTOList(List<UserEntity> users);
 
-    public ResponseEntity<Object> updateUserEntity(UUID  idUserEntity,UserEntity userUpdated);
+    public ResponseEntity<Object> updateUserEntity(UserDetails userDetails,UUID  idUserEntity,UserEntity userUpdated);
     public List<UserEntityDTO> getAllUserEntity();
 
 
-    public ResponseEntity<Object> addImageToUser(UUID UserId, @NotNull MultipartFile image) throws IOException;
-    public ResponseEntity<Object> removeImageFromUser(UUID UserId ) throws IOException;
-    public  ResponseEntity<byte[]> fetchImageFromUser(final UUID UserId) throws IOException;
+    public ResponseEntity<Object> addImageToUser(UserDetails userDetails,UUID UserId, @NotNull MultipartFile image) throws IOException;
+    public ResponseEntity<Object> removeImageFromUser(UserDetails userDetails,UUID UserId ) throws IOException;
+    public  ResponseEntity<byte[]> fetchImageFromUser(UUID UserId) throws IOException;
 
 ////////////////////// all about products ///////////////////////////////////////////////////
     public ResponseEntity<Object> addProductToUser(UserDetails userDetails, UUID userId, Product product);
@@ -60,5 +61,11 @@ public interface UserEntityService {
     ResponseEntity<Object> addProductToFavouriteListUser(UserDetails userDetails, UUID userId, Long productId)throws IOException;
 
     ResponseEntity<Object> deleteFromFavouriteListUser(UserDetails userDetails, UUID userId, Long productId)throws IOException;
+//////////////////////////////comments ////////////////////////////////////////////////
+    ResponseEntity<Object> getAllCommentsProduct(Long idproduct) throws IOException;
+
+    ResponseEntity<Object> addCommentToProduct(UserDetails userDetails, UUID userId, Long productId, Comment comment) throws IOException;
+
+    ResponseEntity<Object> deleteCommentFromProduct(UserDetails userDetails, UUID iduser, Long idproduct,Long comment) throws  IOException;
     /////////////////////////////////////////////////////////////////////////////////////////
 }

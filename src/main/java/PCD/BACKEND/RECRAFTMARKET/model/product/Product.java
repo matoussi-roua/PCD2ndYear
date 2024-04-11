@@ -23,11 +23,11 @@ public class Product {
     private long idProduct;
     private String title;
     private String description;
-    private Number price;
+    private String price;
     private String category;
     private Date targetDate;
-    private Number shopPoints; 
-    private Number points; //number of likes number of comments number of wish list number + shopPoints
+    private Long shopPoints;
+    private Long points; //number of likes number of comments number of wish list number + shopPoints
     private boolean isDone; // the product is sold or not
     private String materials;
 

@@ -5,8 +5,11 @@ import PCD.BACKEND.RECRAFTMARKET.dto.user.UserEntityDTO;
 import PCD.BACKEND.RECRAFTMARKET.dto.user.UserEntityDTOMapper;
 import PCD.BACKEND.RECRAFTMARKET.exceptions.ResourceNotFoundException;
 import PCD.BACKEND.RECRAFTMARKET.model.file.FileDataUser;
+import PCD.BACKEND.RECRAFTMARKET.model.product.Comment;
 import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
 import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
+import PCD.BACKEND.RECRAFTMARKET.repository.CommentRepository;
+import PCD.BACKEND.RECRAFTMARKET.repository.ProductRepository;
 import PCD.BACKEND.RECRAFTMARKET.repository.UserEntityRepository;
 import PCD.BACKEND.RECRAFTMARKET.security.utility.ResponseHandler;
 import PCD.BACKEND.RECRAFTMARKET.service.file.FileServiceUser;
@@ -16,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,8 +34,11 @@ public class UserEntityServiceImpl implements UserEntityService{
 
     private final UserEntityRepository userEntityRepository;
     private final UserEntityDTOMapper userEntityDTOMapper;
+    private final CommentRepository commentRepository;
     private final FileServiceUser fileService;
     private final ProductService productService;
+    private final PasswordEncoder passwordEncoder;
+
 ///////////////////////////ALL about User //////////////////////////////////////////////////////////
     @Override
      public ResponseEntity<Object> fetchUserByUsername(final String username)
@@ -49,15 +56,20 @@ public class UserEntityServiceImpl implements UserEntityService{
     }
 
     @Override
-    public ResponseEntity<Object> updateUserEntity(UUID UserId, UserEntity userUpdated) {
-        UserEntity userToUpdate = getUserById(UserId);
-       // userToUpdate.setPassword(userUpdated.getPassword());
+    public ResponseEntity<Object> updateUserEntity(UserDetails userDetails,UUID userId, UserEntity userUpdated) {
+        final UserEntity userToUpdate=getUserByUsername(userDetails.getUsername());
+        if (!userToUpdate.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        userToUpdate.setFirstname(userUpdated.getFirstname());
+        userToUpdate.setLastname(userUpdated.getLastname());
         userToUpdate.setPoints(userUpdated.getPoints());
-       // userToUpdate.setUsername(userUpdated.getUsername());
+       userToUpdate.setUsername(userUpdated.getUsername());
         userToUpdate.setPhonenumber(userUpdated.getPhonenumber());
+        userToUpdate.setPassword(passwordEncoder.encode(userUpdated.getPassword()));
         userToUpdate.setAddress(userUpdated.getAddress());
         userEntityRepository.save(userToUpdate);
-        final String successResponse = String.format("User with ID %d updated successfully", UserId);
+        final String successResponse = String.format("User with ID %s updated successfully", userId);
 
         return ResponseHandler.generateResponse(successResponse, HttpStatus.OK);
 
@@ -86,8 +98,11 @@ public class UserEntityServiceImpl implements UserEntityService{
 
 
     @Override
-    public ResponseEntity<Object> addImageToUser(UUID UserId, @NotNull MultipartFile image) throws IOException {
-        final UserEntity existingUser =  getUserById(UserId);
+    public ResponseEntity<Object> addImageToUser(UserDetails userDetails,UUID userId, @NotNull MultipartFile image) throws IOException {
+        final UserEntity existingUser=getUserByUsername(userDetails.getUsername());
+        if (!existingUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
         final FileDataUser newImage = fileService.processUploadedFile(image);
         newImage.setUserFile(existingUser);
         existingUser.setFileUser(newImage);
@@ -97,8 +112,11 @@ public class UserEntityServiceImpl implements UserEntityService{
     }
 
     @Override
-    public ResponseEntity<Object> removeImageFromUser(UUID UserId) throws IOException {
-        final UserEntity existingUser = getUserById(UserId);
+    public ResponseEntity<Object> removeImageFromUser(UserDetails userDetails,UUID userId) throws IOException {
+        final UserEntity existingUser=getUserByUsername(userDetails.getUsername());
+        if (!existingUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
         if(existingUser.getFileUser() == null){
             throw new IllegalStateException("there is no image to delete");
         }
@@ -114,8 +132,11 @@ public class UserEntityServiceImpl implements UserEntityService{
     }
 
     @Override
-    public  ResponseEntity<byte[]> fetchImageFromUser(final UUID UserId) throws IOException {
+    public  ResponseEntity<byte[]> fetchImageFromUser(UUID UserId) throws IOException {
         final UserEntity user = getUserById(UserId);
+        if(user.getFileUser() == null){
+            throw new IllegalStateException("there is no image to show");
+        }
         final FileDataUser fileDataUser = user.getFileUser();
         return fileService.downloadFile(fileDataUser);
     }
@@ -223,7 +244,7 @@ public ResponseEntity<Object> getAllLikesListOfUser(UserDetails userDetails, UUI
         //make sure the id of user is really his id
     final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
     if (!currentUser.getId().equals(userId)) {
-        return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.OK);
     }
     List<Product> likesList=currentUser.getLikedProducts();
     return ResponseHandler.generateResponse(likesList, HttpStatus.OK);
@@ -327,6 +348,58 @@ public ResponseEntity<Object> getAllFavouriteListOfUser(UserDetails userDetails,
         }
     }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public ResponseEntity<Object> getAllCommentsProduct(Long idproduct) throws IOException {
+        final Product product=productService.getProductById(idproduct);
+        if (product.getComments()==null){
+            return ResponseHandler.generateResponse("No comments for this product", HttpStatus.OK);
+        }
+        final List<Comment> commentsOfProduct = product.getComments();
+        return  ResponseHandler.generateResponse(commentsOfProduct,HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> addCommentToProduct(UserDetails userDetails, UUID userId, Long productId, Comment comment) throws IOException {
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        final Product product=productService.getProductById(productId);
+        try{
+            product.getComments().add(comment);
+            currentUser.getCommentsUser().add(comment);
+            comment.setCommenter(currentUser);
+            comment.setCommentProduct(product);
+            commentRepository.save(comment);
+            return  ResponseHandler.generateResponse("comment added successfully ",HttpStatus.OK);
+        }
+        catch (Exception e){
+            return ResponseHandler.generateResponse("error in adding the comment",HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteCommentFromProduct(UserDetails userDetails, UUID userId, Long productId,Long commentId) throws IOException {
+        final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+        if (!currentUser.getId().equals(userId)) {
+            return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        boolean existingComment=currentUser.getCommentsUser().stream()
+                .anyMatch(comment -> comment.getIdComment() == commentId);
+        if (!existingComment) {
+            ResponseHandler.generateResponse("NOT AUTHORIZED",HttpStatus.UNAUTHORIZED);
+        }
+        final Comment commentToDelete=commentRepository.getById(commentId);
+        final Product product = productService.getProductById(productId);
+
+        product.getComments().remove(commentToDelete);
+        currentUser.getCommentsUser().remove(existingComment);
+        commentRepository.deleteById(commentId);
+        return ResponseHandler.generateResponse("Comment deleted successfully",HttpStatus.OK);
+
+    }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -18,7 +18,7 @@ public record UserEntityDTO (
        // Number phoneNumber,
 
         String address,
-        Number points
+        Long points
 
 
 ){
