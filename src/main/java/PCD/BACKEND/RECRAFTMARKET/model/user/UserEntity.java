@@ -8,6 +8,7 @@ import PCD.BACKEND.RECRAFTMARKET.model.product.Comment;
 import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
 import PCD.BACKEND.RECRAFTMARKET.model.role.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,8 +47,13 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "address")
     private String address;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(name = "points")
-    private Long points; // number of products with their likes and comments and shop button
+    // total points are the sum of products he liked + products
+    // adding to his favourite list + number of click "shop now"
+    // + number of posts he published
+    private Long points=0L;
 
     @OneToOne
     private Role role ;

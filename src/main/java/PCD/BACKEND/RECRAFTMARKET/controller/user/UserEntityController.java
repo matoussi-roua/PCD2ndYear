@@ -23,7 +23,7 @@ public class UserEntityController {
         this.userService = userService;
     }
     //////////////////user details ////////////////////////////////////////////////////////
-    //worked
+    //DTO
     @GetMapping(value="/user/{username}")  //si je suis certain que la methode est get
     public ResponseEntity<Object> fetchUserByUsername(@PathVariable String username) {
     return userService.fetchUserByUsername(username);
@@ -32,6 +32,16 @@ public class UserEntityController {
     @PutMapping(value="/updateuser/{id}")
     public ResponseEntity<Object> updateUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID id, @RequestBody UserEntity userUpdated) {
         return userService.updateUserEntity(userDetails,id,userUpdated);
+    }
+    //a tester DTO
+    @GetMapping(value = "/allusers")
+    public ResponseEntity<Object> allUsers(){
+        return userService.fetchAllUserEntity();
+    }
+//a tester DTO
+    @GetMapping(value = "/userbyid/{iduser}")
+    public ResponseEntity<Object> usersByid(@PathVariable("iduser") UUID iduser){
+        return userService.fetchUserEntityById(iduser);
     }
 
 ///////////////////////////////////////////image of user/////////////////////////////////////////////////
@@ -130,4 +140,20 @@ return userService.deleteProductFromUser(userDetails,iduser,idproduct);
     public ResponseEntity<Object> deleteCommentFromProduct(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID iduser,@PathVariable Long idproduct,@PathVariable Long idcomment) throws IOException{
     return userService.deleteCommentFromProduct(userDetails,iduser,idproduct,idcomment);
     }
+    //////////////////change status/////////////////////////////
+
+
+    /////////////////// LeaderBoard /////////////////////////////////
+    @GetMapping(value = "/leaderboard/{iduser}")
+    public ResponseEntity<Object> getLeaderBoard(@PathVariable("iduser") UUID iduser) throws IOException{
+        return userService.getLeaderBoard(iduser);
+    }
+    ////////////////////////ShopPoints///////////////////////////
+    @PutMapping(value = "/shopnow/{iduser}/{idproduct}")
+    public ResponseEntity<Object> shopnow(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("iduser") UUID iduser ,@PathVariable("idproduct")Long idproduct)throws IOException{
+        return userService.shopnow(userDetails,iduser,idproduct);
+    }
+    /////////////////////////////////For admin refreshing the points //////////////////////////
+
+
 }

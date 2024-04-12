@@ -12,6 +12,8 @@ import java.util.UUID;
 
 public record UserEntityDTO (
         UUID id,
+        String firsname,
+        String lastname,
         String username,
         Role role,
 

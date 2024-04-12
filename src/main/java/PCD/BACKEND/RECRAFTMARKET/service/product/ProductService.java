@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ProductService {
 
@@ -33,4 +34,9 @@ public interface ProductService {
     public ResponseEntity<Object> removeImageFromProduct(long productId, long imageId) throws IOException;
     public  ResponseEntity<byte[]> fetchImageFromProduct(final long productId,final int fileIndex) throws IOException;
 
+    void increaseShopPointsProduct(Long productId, long l);
+    void updatePointsProduct(Long productId);
+
+    //////////////this for admin ;updating points of all products////////////////////
+    void updatePointsAllProduct();
 }

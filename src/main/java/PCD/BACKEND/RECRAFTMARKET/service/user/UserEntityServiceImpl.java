@@ -9,7 +9,6 @@ import PCD.BACKEND.RECRAFTMARKET.model.product.Comment;
 import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
 import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
 import PCD.BACKEND.RECRAFTMARKET.repository.CommentRepository;
-import PCD.BACKEND.RECRAFTMARKET.repository.ProductRepository;
 import PCD.BACKEND.RECRAFTMARKET.repository.UserEntityRepository;
 import PCD.BACKEND.RECRAFTMARKET.security.utility.ResponseHandler;
 import PCD.BACKEND.RECRAFTMARKET.service.file.FileServiceUser;
@@ -27,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 @AllArgsConstructor
 @Service
 public class UserEntityServiceImpl implements UserEntityService{
@@ -39,19 +40,33 @@ public class UserEntityServiceImpl implements UserEntityService{
     private final ProductService productService;
     private final PasswordEncoder passwordEncoder;
 
-///////////////////////////ALL about User //////////////////////////////////////////////////////////
+
+    ///////////////////////////To DTO ////////////////////////
+    @Override
+    public UserEntityDTO mapToDTOItem(UserEntity user) {
+        return userEntityDTOMapper.apply(user);
+    }
+
+    @Override
+    public List<UserEntityDTO> mapToDTOList(List<UserEntity> users)
+    {
+        return users.stream().map(userEntityDTOMapper).toList();
+    }
+
+
+    ///////////////////////////ALL about User //////////////////////////////////////////////////////////
     @Override
      public ResponseEntity<Object> fetchUserByUsername(final String username)
      {
          final UserEntity savedUser = getUserByUsername(username);
-         final UserEntityDTO user = userEntityDTOMapper.apply(savedUser);
+         final UserEntityDTO user = mapToDTOItem(savedUser);
          return ResponseHandler.generateResponse(user , HttpStatus.OK) ;
      }
 
     @Override
     public ResponseEntity<Object> fetchUserEntityById(UUID UserId) {
         final UserEntity savedUser = getUserById(UserId);
-        final UserEntityDTO user  = userEntityDTOMapper.apply(savedUser);
+        final UserEntityDTO user  = mapToDTOItem(savedUser);
         return ResponseHandler.generateResponse(user,HttpStatus.OK);
     }
 
@@ -63,7 +78,7 @@ public class UserEntityServiceImpl implements UserEntityService{
         }
         userToUpdate.setFirstname(userUpdated.getFirstname());
         userToUpdate.setLastname(userUpdated.getLastname());
-        userToUpdate.setPoints(userUpdated.getPoints());
+       // userToUpdate.setPoints(userUpdated.getPoints());
        userToUpdate.setUsername(userUpdated.getUsername());
         userToUpdate.setPhonenumber(userUpdated.getPhonenumber());
         userToUpdate.setPassword(passwordEncoder.encode(userUpdated.getPassword()));
@@ -85,16 +100,6 @@ public class UserEntityServiceImpl implements UserEntityService{
         return ResponseHandler.generateResponse(users,HttpStatus.OK);
     }
 
-    @Override
-    public UserEntityDTO mapToDTOItem(UserEntity user) {
-        return userEntityDTOMapper.apply(user);
-    }
-
-    @Override
-    public List<UserEntityDTO> mapToDTOList(List<UserEntity> users)
-    {
-        return users.stream().map(userEntityDTOMapper).toList();
-    }
 
 
     @Override
@@ -150,12 +155,12 @@ public class UserEntityServiceImpl implements UserEntityService{
             return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
         }
 
-        UserEntity user = getUserById(userId);
         Product productadded=productService.addProduct(product);
-        productadded.setPublisher(user);
+        increasePointsUser(userId,50L);
+        productadded.setPublisher(currentUser);
         // Add product to user's list of products
-        user.getProductsList().add(product);
-        userEntityRepository.save(user);
+        currentUser.getProductsList().add(product);
+        userEntityRepository.save(currentUser);
 
         return ResponseHandler.generateResponse("Product added to user successfully.", HttpStatus.OK);
     }
@@ -213,7 +218,9 @@ public class UserEntityServiceImpl implements UserEntityService{
                 .anyMatch(product -> product.getIdProduct() == productId);
         // If productFound is true, update the product and save the user entity
         if (productFound) {
-            productService.deleteProduct(productId);//the problem is here
+            productService.deleteProduct(productId);
+            decreasePointsUser(userId,50L);
+            //the problem is here
             //userEntityRepository.save(currentUser); here is the problem :{
             //    "timestamp": "2024-04-08T17:03:49.1732377",
             //    "status": "BAD_REQUEST",
@@ -259,6 +266,8 @@ public ResponseEntity<Object> getAllLikesListOfUser(UserDetails userDetails, UUI
         final Product likedProduct =productService.getProductById(productId);
         currentUser.getLikedProducts().add(likedProduct);
         likedProduct.getLoversList().add(currentUser);
+        increasePointsUser(userId,1L);
+        productService.updatePointsProduct(productId);
         // Add product to user's list of products
         userEntityRepository.save(currentUser);
         return ResponseHandler.generateResponse("Product added to likes list successfully.", HttpStatus.OK);
@@ -275,6 +284,8 @@ public ResponseEntity<Object> getAllLikesListOfUser(UserDetails userDetails, UUI
 
         // Remove product from user's likes list
         boolean removedFromLikes = currentUser.getLikedProducts().remove(likedProduct);
+        decreasePointsUser(userId,1L);
+        productService.updatePointsProduct(productId);
 
         if (!removedFromLikes) {
             return ResponseHandler.generateResponse("Product is not in user's likes list.", HttpStatus.BAD_REQUEST);
@@ -312,6 +323,8 @@ public ResponseEntity<Object> getAllFavouriteListOfUser(UserDetails userDetails,
         final Product favouriteProduct =productService.getProductById(productId);
         currentUser.getFavouriteProducts().add(favouriteProduct);
         favouriteProduct.getWantersList().add(currentUser);
+        increasePointsUser(userId,1L);
+        productService.updatePointsProduct(productId);
         // Add product to user's list of products
         try {
             userEntityRepository.save(currentUser);
@@ -332,12 +345,15 @@ public ResponseEntity<Object> getAllFavouriteListOfUser(UserDetails userDetails,
         // Remove product from user's likes list
         boolean removedFromFavourite = currentUser.getFavouriteProducts().remove(favouriteProduct);
 
+
         if (!removedFromFavourite) {
             return ResponseHandler.generateResponse("Product is not in user's favourite list.", HttpStatus.BAD_REQUEST);
         }
 
         // Remove user from product's lovers list
         favouriteProduct.getWantersList().remove(currentUser);
+        decreasePointsUser(userId,1L);
+        productService.updatePointsProduct(productId);
 
         // Save changes to the database
         try {
@@ -372,6 +388,8 @@ public ResponseEntity<Object> getAllFavouriteListOfUser(UserDetails userDetails,
             currentUser.getCommentsUser().add(comment);
             comment.setCommenter(currentUser);
             comment.setCommentProduct(product);
+            increasePointsUser(userId,1L);
+            productService.updatePointsProduct(productId);
             commentRepository.save(comment);
             return  ResponseHandler.generateResponse("comment added successfully ",HttpStatus.OK);
         }
@@ -397,11 +415,68 @@ public ResponseEntity<Object> getAllFavouriteListOfUser(UserDetails userDetails,
         product.getComments().remove(commentToDelete);
         currentUser.getCommentsUser().remove(existingComment);
         commentRepository.deleteById(commentId);
+        decreasePointsUser(userId,1L);
+        productService.updatePointsProduct(productId);
         return ResponseHandler.generateResponse("Comment deleted successfully",HttpStatus.OK);
 
     }
+/////////////////////////////leaderboard///////////////////////////////////////////////
+    @Override
+    public ResponseEntity<Object> getLeaderBoard(UUID iduser) {
+        List<UserEntityDTO> users =mapToDTOList(userEntityRepository.findAllByOrderByPointsDesc());
+       // List<UserEntityDTO> userDTOs = users.stream()
+               // .map(userEntityDTOMapper)
+                //.collect(Collectors.toList());
+        return ResponseHandler.generateResponse(users, HttpStatus.OK);
+    }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////fix points User////////////////////////////////////////////////////////////////
+    @Override
+    public void increasePointsUser(UUID userId, Long points) {
+        final UserEntity user=getUserById(userId);
+        user.setPoints(user.getPoints()+points);
+        userEntityRepository.save(user);
+    }
+    @Override
+    public void decreasePointsUser(UUID userId, Long points) {
+        final UserEntity user=getUserById(userId);
+        user.setPoints(user.getPoints()-points);
+        userEntityRepository.save(user);
+
+
+    }
+    //////////////////fix Points Product ///////////////////////
+    /*
+    *After a user likes a product.
+    * After a user comment a product
+    *After a user adds a product to their favorites.
+    *After the shop points of a product are updated.
+    * call productService.updatePointsProduct(productId);
+    * */
+/////////////////////////////////////////////Shopping part///////////////////////////
+
+    /* this part will increase the "shop points" of the product for now and
+    * later (OUR PERSPECTIVE)this function should transfer a message containing
+    * the product you choose to the owner and start a conversation with him
+    * each product(frontend) has a button "shop now" once you click on it this function
+    * should be called and you will automatically redirect to the chat box with the owner
+    */
+@Override
+public ResponseEntity<Object> shopnow(UserDetails userDetails, UUID userId, Long productId) throws IOException {
+    final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+    if (!currentUser.getId().equals(userId)) {
+        return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+    }
+    //the user should not be the publisher of the product but it is ok we can hide the button in the frontend
+    increasePointsUser(userId,5L);
+    productService.increaseShopPointsProduct(productId,5L);
+    productService.updatePointsProduct(productId);
+    return ResponseHandler.generateResponse("great! your points are increasing",HttpStatus.OK);
+}
+
+
+    ///////////////////////////////////////////////important/////////////////////////////////
 
     public UserEntity getUserById(final UUID userId) {
         return userEntityRepository.fetchUserById(userId).orElseThrow(
@@ -415,7 +490,7 @@ public ResponseEntity<Object> getAllFavouriteListOfUser(UserDetails userDetails,
                 () -> new ResourceNotFoundException("The User with USERNAME '%s' could not be found in our system.".formatted(username))
         );
     }
-
+///////////////////////////////////////// END //////////////////////////////////////////////////////////////////
 
 
 

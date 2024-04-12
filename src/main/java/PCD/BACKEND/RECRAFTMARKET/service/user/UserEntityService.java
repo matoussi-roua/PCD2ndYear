@@ -45,6 +45,11 @@ public interface UserEntityService {
     public ResponseEntity<Object> getAllProductsOfUser(UUID userId);
 
 
+    ////////////////////////////////////fix points////////////////////////////////////////////////////////////////
+    void increasePointsUser(UUID userId, Long points);
+
+    void decreasePointsUser(UUID userId, Long points);
+
     UserEntity getUserByUsername(String username);
 //////////////////////////////Likes List//////////////////////////////////////////////////
     ResponseEntity<Object> getAllLikesListOfUser(UserDetails userDetails, UUID userId)throws IOException;
@@ -67,5 +72,9 @@ public interface UserEntityService {
     ResponseEntity<Object> addCommentToProduct(UserDetails userDetails, UUID userId, Long productId, Comment comment) throws IOException;
 
     ResponseEntity<Object> deleteCommentFromProduct(UserDetails userDetails, UUID iduser, Long idproduct,Long comment) throws  IOException;
+
+    ResponseEntity<Object> getLeaderBoard(UUID iduser);
+
+    ResponseEntity<Object> shopnow(UserDetails userDetails, UUID iduser, Long idproduct)throws IOException;
     /////////////////////////////////////////////////////////////////////////////////////////
 }

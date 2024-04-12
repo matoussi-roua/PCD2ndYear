@@ -26,6 +26,10 @@ public class productController {
   public void deleteProduct(@PathVariable long id)throws IOException{
         productService.deleteProduct(id);
   }
+    @PutMapping(value = "/permit/refrechpointsproduct")
+    public void refreshPointsProduct(){
+        productService.updatePointsAllProduct();
+    }
   //get product by id
   //worked
     //AMA maandi manaamel biha manajemch nfassa5 imaget lproduit akahaw l mafroudh nesthaqha kn ki nfassa5 lproduit

@@ -3,6 +3,7 @@ package PCD.BACKEND.RECRAFTMARKET.model.product;
 import PCD.BACKEND.RECRAFTMARKET.model.file.FileData;
 import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,23 +20,27 @@ import java.util.List;
 @Table
 public class Product {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long idProduct;
     private String title;
     private String description;
     private String price;
     private String category;
     private Date targetDate;
-    private Long shopPoints;
-    private Long points; //number of likes number of comments number of wish list number + shopPoints
+    // once you click on shop now button
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long shopPoints = 0L;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    //totalPoints = likesPoints + wishListPoints + shopPoints + commentsPoints
+    private Long points = 0L;
     private boolean isDone; // the product is sold or not
     private String materials;
-
-   // @ElementCollection(fetch = FetchType.LAZY)
+    private String Status;
+    // @ElementCollection(fetch = FetchType.LAZY)
 
     @OneToMany(mappedBy = "commentProduct")
     @JsonIgnore
-    private List<Comment> comments ;
+    private List<Comment> comments;
 
 
     @OneToMany(mappedBy = "product")
@@ -43,7 +48,7 @@ public class Product {
     private List<FileData> filesProduct;
 
     @ManyToOne
-    @JoinColumn(name="idUser")
+    @JoinColumn(name = "idUser")
     @JsonIgnore
     private UserEntity publisher;
 
@@ -54,36 +59,5 @@ public class Product {
 
     @ManyToMany(mappedBy = "favouriteProducts")
     @JsonIgnore
-    private List<UserEntity> wantersList ;
-/*
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + (int) (idPost ^ (idPost >>> 32));
-        return result;
-        }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Post other = (Post) obj;
-        if (idPost != other.idPost)
-            return false;
-        return true;
-    }*/
-    /*@ManyToMany(mappedBy = "listfavourite")
-    Set<Users> listusers = new HashSet<>();
-
-    @ManyToMany(mappedBy = "shoppinglist")
-    Set<Users> listusersforshopping = new HashSet<>();
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "idImage", referencedColumnName = "idImage")
-    private ImageProduct imageproduct;*/
+    private List<UserEntity> wantersList;
 }

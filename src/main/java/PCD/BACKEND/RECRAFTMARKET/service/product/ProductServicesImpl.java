@@ -3,6 +3,7 @@ package PCD.BACKEND.RECRAFTMARKET.service.product;
 import PCD.BACKEND.RECRAFTMARKET.exceptions.ResourceNotFoundException;
 import PCD.BACKEND.RECRAFTMARKET.model.file.FileData;
 import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
+
 import PCD.BACKEND.RECRAFTMARKET.repository.ProductRepository;
 import PCD.BACKEND.RECRAFTMARKET.security.utility.ResponseHandler;
 import PCD.BACKEND.RECRAFTMARKET.service.file.FileService;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+
 @Service
 public class ProductServicesImpl implements ProductService{
     @Autowired
@@ -23,10 +25,6 @@ public class ProductServicesImpl implements ProductService{
     @Autowired
     private FileService fileService;
 
-//    @Override
-//    public Product addProduct(Product product) {
-//        return productRepository.save(product);
-//    }
     @Override
     public Product addProduct(Product product) {
 
@@ -52,14 +50,10 @@ public class ProductServicesImpl implements ProductService{
        ProductToUpdate.setPrice(updatedProduct.getPrice());
        ProductToUpdate.setCategory(updatedProduct.getCategory());
        ProductToUpdate.setMaterials(updatedProduct.getMaterials());
+       ProductToUpdate.setStatus(updatedProduct.getStatus());
        return productRepository.save(ProductToUpdate);
     }
 
-  /*  @Override
-    public void deleteProduct(long productId) throws IOException{
-        removeAllImagesFromProduct(productId);
-        productRepository.deleteById(productId);
-    }*/
   @Override
   public void deleteProduct(long productId) throws IOException {
       // Check if the product exists before attempting to delete it
@@ -145,5 +139,56 @@ public class ProductServicesImpl implements ProductService{
         final FileData fileData = product.getFilesProduct().get(fileIndex);
         return fileService.downloadFile(fileData);
     }
+///////////////////////// calculating the score ////////////////////////////////////////
+    @Override
+    public void increaseShopPointsProduct(Long productId, long l) {
+        final Product product=getProductById(productId);
+        product.setShopPoints(product.getShopPoints()+l);
+        productRepository.save(product);
+    }
+// updating  points of product
+    @Override
+    public void updatePointsProduct(Long productId) {
+        Product product = getProductById(productId);
+
+        // Calculate the points based on likes, wish lists, shop points, etc.
+        long totalPoints = calculateTotalPoints(product);
+
+        // Update the points attribute of the product
+        product.setPoints(totalPoints);
+
+        // Save the updated product to the database
+        productRepository.save(product);
+    }
+//calculate the point of a product
+    private long calculateTotalPoints(Product product) {
+        // Calculate total points here based on your business logic
+        long likesPoints = product.getLoversList().size(); // Example: Number of likes
+        long wishListPoints = product.getWantersList().size(); // Example: Number of wish lists
+        long shopPoints = product.getShopPoints(); // Example: Shop points
+        long commentsPoints=product.getComments().size();
+
+
+        // Calculate total points
+        long totalPoints = likesPoints + wishListPoints + shopPoints + commentsPoints;
+
+        return totalPoints;
+    }
+
+    @Override
+    public void updatePointsAllProduct() {
+        // Retrieve all products from the database
+        List<Product> allProducts = productRepository.findAll();
+
+        // Iterate through each product and update its points
+        for (Product product : allProducts) {
+            updatePointsProduct(product.getIdProduct());
+        }
+    }
+
+
 
 }
+
+
+
