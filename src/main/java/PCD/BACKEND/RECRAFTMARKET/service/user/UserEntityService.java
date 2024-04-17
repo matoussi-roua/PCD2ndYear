@@ -50,6 +50,11 @@ public interface UserEntityService {
 
     void decreasePointsUser(UUID userId, Long points);
 
+    ///////////////////////////////////////////////important/////////////////////////////////
+    //UserEntity getUserById(UUID userId);
+
+    ResponseEntity<Object> getUserByIdAuthorized(UserDetails userDetails, UUID userId);
+
     UserEntity getUserByUsername(String username);
 //////////////////////////////Likes List//////////////////////////////////////////////////
     ResponseEntity<Object> getAllLikesListOfUser(UserDetails userDetails, UUID userId)throws IOException;
@@ -76,5 +81,11 @@ public interface UserEntityService {
     ResponseEntity<Object> getLeaderBoard(UUID iduser);
 
     ResponseEntity<Object> shopnow(UserDetails userDetails, UUID iduser, Long idproduct)throws IOException;
+
+    ResponseEntity<Object> changeStatus(UserDetails userDetails, UUID iduser, Long idproduct);
+
+    boolean adminExists();
+
+    void createAdmin();
     /////////////////////////////////////////////////////////////////////////////////////////
 }

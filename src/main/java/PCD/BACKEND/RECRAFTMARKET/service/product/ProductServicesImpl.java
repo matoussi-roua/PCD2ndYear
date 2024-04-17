@@ -49,6 +49,7 @@ public class ProductServicesImpl implements ProductService{
        ProductToUpdate.setDescription(updatedProduct.getDescription());
        ProductToUpdate.setPrice(updatedProduct.getPrice());
        ProductToUpdate.setCategory(updatedProduct.getCategory());
+       ProductToUpdate.setSold(updatedProduct.isSold());
        ProductToUpdate.setMaterials(updatedProduct.getMaterials());
        ProductToUpdate.setStatus(updatedProduct.getStatus());
        return productRepository.save(ProductToUpdate);
@@ -186,6 +187,12 @@ public class ProductServicesImpl implements ProductService{
         }
     }
 
+    @Override
+    public void changeStatus(Long productId) {
+        final Product product =getProductById(productId);
+        product.setSold(!product.isSold());
+        productRepository.save(product);
+    }
 
 
 }

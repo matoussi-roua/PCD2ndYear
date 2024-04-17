@@ -27,5 +27,6 @@ public interface UserEntityRepository extends JpaRepository<UserEntity, UUID> {
     @Query("SELECT u FROM UserEntity u ORDER BY u.points DESC")
     List<UserEntity> findAllByOrderByPointsDesc();
 
-
+boolean existsUserEntityByUsername(String name);
+    //boolean existsByUsername(String admin);
 }

@@ -24,22 +24,22 @@ public class UserEntityController {
     }
     //////////////////user details ////////////////////////////////////////////////////////
     //DTO
-    @GetMapping(value="/user/{username}")  //si je suis certain que la methode est get
+    @GetMapping(value="/permit/user/{username}")
     public ResponseEntity<Object> fetchUserByUsername(@PathVariable String username) {
     return userService.fetchUserByUsername(username);
     }
     //confidential OK
-    @PutMapping(value="/updateuser/{id}")
+    @PutMapping(value="/client/updateuser/{id}")
     public ResponseEntity<Object> updateUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID id, @RequestBody UserEntity userUpdated) {
         return userService.updateUserEntity(userDetails,id,userUpdated);
     }
-    //a tester DTO
-    @GetMapping(value = "/allusers")
+    // DTO
+    @GetMapping(value = "/permit/allusers")
     public ResponseEntity<Object> allUsers(){
         return userService.fetchAllUserEntity();
     }
 //a tester DTO
-    @GetMapping(value = "/userbyid/{iduser}")
+    @GetMapping(value = "/permit/userbyid/{iduser}")
     public ResponseEntity<Object> usersByid(@PathVariable("iduser") UUID iduser){
         return userService.fetchUserEntityById(iduser);
     }
@@ -49,18 +49,18 @@ public class UserEntityController {
     //fetchimage from user doesn't work
     //worked
     //confidential OK
-    @PostMapping(value="/addimagetouser/{id}")
+    @PostMapping(value="/client/addimagetouser/{id}")
     public ResponseEntity<Object> addImageToUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID id, @RequestParam("file") MultipartFile file)throws IOException{
         return userService.addImageToUser(userDetails,id,file);
     }
     //worked
     //confidential
-    @DeleteMapping(value = "/removeimage/{id}")
+    @DeleteMapping(value = "/client/removeimage/{id}")
     public ResponseEntity<Object> removeImageFromUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID id ) throws IOException{
         return userService.removeImageFromUser(userDetails,id);
     }
 //worked
-    @GetMapping(value = "/imageuser/{id}")
+    @GetMapping(value = "/permit/imageuser/{id}")
     public  ResponseEntity<byte[]> fetchImageFromUser(@PathVariable("id")  UUID id) throws IOException{
         return userService.fetchImageFromUser(id);
     }
@@ -71,89 +71,95 @@ public class UserEntityController {
 
     //worked
     //confidential OK
-    @PutMapping(value = "/addproductuser/{id}")
+    @PutMapping(value = "/client/addproductuser/{id}")
     public ResponseEntity<Object> addProductToUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID id, @RequestBody Product product) {
         return userService.addProductToUser(userDetails,id,product);
     }
 
     //worked
     //confidential OK
-    @PutMapping(value = "/addimageproduct/{iduser}/{idproduct}")
+    @PutMapping(value = "/client/addimageproduct/{iduser}/{idproduct}")
     public ResponseEntity<Object> addImageToProductUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID iduser,@PathVariable Long idproduct,@RequestParam("file") MultipartFile image) throws IOException {
         return userService.addImageToProductUser(userDetails,iduser,idproduct,image);
     }
     //worked
     //confidential OK
-    @PutMapping(value = "/updateproductuser/{iduser}/{idproduct}")
+    @PutMapping(value = "/client/updateproductuser/{iduser}/{idproduct}")
     public ResponseEntity<Object> addProductToUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID iduser,@PathVariable Long idproduct,@RequestBody Product productupdated){
         return userService.updateProductUser(userDetails,iduser,idproduct,productupdated);
     }
     //worked
     //confidential OK
-    @DeleteMapping(value = "/deleteproductuser/{iduser}/{idproduct}")
+    @DeleteMapping(value = "/client/deleteproductuser/{iduser}/{idproduct}")
     public ResponseEntity<Object> deleteProductFromUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID iduser,@PathVariable Long idproduct)throws IOException{
 return userService.deleteProductFromUser(userDetails,iduser,idproduct);
     }
 
     //worked
-    @GetMapping(value = "/allproductsuser/{id}")
+    @GetMapping(value = "/permit/allproductsuser/{id}")
     public ResponseEntity<Object> getAllProductsOfUser(@PathVariable UUID id){
         return userService.getAllProductsOfUser(id);
     }
 
 ///////////////////////////////////this part is for the Likes list/////////////////
-    @GetMapping(value = "/alllikeslistuser/{id}")
+    @GetMapping(value = "/client/alllikeslistuser/{id}")
     public ResponseEntity<Object> getAllLikesListOfUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("id") UUID id) throws IOException {
     return userService.getAllLikesListOfUser(userDetails,id);
 }
-    @PutMapping(value = "/addtolikeslistuser/{iduser}/{idproduct}")
+    @PutMapping(value = "/client/addtolikeslistuser/{iduser}/{idproduct}")
     public ResponseEntity<Object> addProductToLikesListUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("iduser") UUID iduser,@PathVariable("idproduct") Long idproduct)throws IOException{
         return userService.addProductToLikesListUser(userDetails,iduser,idproduct);
     }
-    @DeleteMapping(value = "/deletefromlikeslistuser/{iduser}/{idproduct}")
+    @DeleteMapping(value = "/client/deletefromlikeslistuser/{iduser}/{idproduct}")
     public ResponseEntity<Object> deleteFromLikesListUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("iduser") UUID iduser,@PathVariable("idproduct") Long idproduct)throws IOException{
         return userService.deleteFromLikesListUser(userDetails,iduser,idproduct);
     }
     ///////////////////////////////////this part is for the Likes list/////////////////
-    @GetMapping(value = "/allfavouritelistuser/{id}")
+    @GetMapping(value = "/client/allfavouritelistuser/{id}")
     public ResponseEntity<Object> getAllFavouriteListOfUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("id") UUID id)throws IOException{
         return userService.getAllFavouriteListOfUser(userDetails,id);
     }
-    @PutMapping(value = "/addtofavouritelistuser/{iduser}/{idproduct}")
+    @PutMapping(value = "/client/addtofavouritelistuser/{iduser}/{idproduct}")
     public ResponseEntity<Object> addProductToFavouriteListUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("iduser") UUID iduser,@PathVariable("idproduct") Long idproduct)throws IOException{
         return userService.addProductToFavouriteListUser(userDetails,iduser,idproduct);
     }
-    @DeleteMapping(value = "/deletefromfavouritelistuser/{iduser}/{idproduct}")
+    @DeleteMapping(value = "/client/deletefromfavouritelistuser/{iduser}/{idproduct}")
     public ResponseEntity<Object> deleteFromFavouriteListUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("iduser") UUID iduser,@PathVariable("idproduct") Long idproduct)throws IOException{
         return userService.deleteFromFavouriteListUser(userDetails,iduser,idproduct);
     }
     ///////////////////////////////// Comments //////////////////////////////////
-    @GetMapping(value = "/getallcommentsproduct/{idproduct}")
+    @GetMapping(value = "/permit/getallcommentsproduct/{idproduct}")
     public ResponseEntity<Object> getAllCommentsProduct(@PathVariable("idproduct") Long idproduct)throws IOException{
     return userService.getAllCommentsProduct(idproduct);
     }
-    @PutMapping(value = "/addcommenttoproduct/{iduser}/{idproduct}")
+    @PutMapping(value = "/client/addcommenttoproduct/{iduser}/{idproduct}")
     public ResponseEntity<Object> addCommentToProduct(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("iduser") UUID iduser, @PathVariable("idproduct") Long idproduct, @RequestBody Comment comment)throws IOException{
     return userService.addCommentToProduct(userDetails,iduser,idproduct,comment);
     }
-    @DeleteMapping(value = "/deletecommentfromproduct/{iduser}/{idproduct}/{idcomment}")
+    //i have to add that the owner can remove the comments also
+    @DeleteMapping(value = "/client/deletecommentfromproduct/{iduser}/{idproduct}/{idcomment}")
     public ResponseEntity<Object> deleteCommentFromProduct(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID iduser,@PathVariable Long idproduct,@PathVariable Long idcomment) throws IOException{
     return userService.deleteCommentFromProduct(userDetails,iduser,idproduct,idcomment);
     }
     //////////////////change status/////////////////////////////
-
+@PutMapping(value = "/client/changestatus/{iduser}/{idproduct}")
+public ResponseEntity<Object> changeStatus(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("iduser") UUID iduser ,@PathVariable("idproduct" ) Long idproduct)throws IOException{
+        return userService.changeStatus(userDetails,iduser,idproduct);
+}
 
     /////////////////// LeaderBoard /////////////////////////////////
-    @GetMapping(value = "/leaderboard/{iduser}")
+    @GetMapping(value = "/permit/leaderboard/{iduser}")
     public ResponseEntity<Object> getLeaderBoard(@PathVariable("iduser") UUID iduser) throws IOException{
         return userService.getLeaderBoard(iduser);
     }
     ////////////////////////ShopPoints///////////////////////////
-    @PutMapping(value = "/shopnow/{iduser}/{idproduct}")
+    @PutMapping(value = "/client/shopnow/{iduser}/{idproduct}")
     public ResponseEntity<Object> shopnow(@AuthenticationPrincipal UserDetails userDetails,@PathVariable("iduser") UUID iduser ,@PathVariable("idproduct")Long idproduct)throws IOException{
         return userService.shopnow(userDetails,iduser,idproduct);
     }
-    /////////////////////////////////For admin refreshing the points //////////////////////////
-
-
+    //a tester
+@GetMapping(value = "/client/userauthorized/{iduser}")
+public ResponseEntity<Object> getUserById(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("iduser") UUID iduser){
+       return userService.getUserByIdAuthorized(userDetails,iduser);
+}
 }

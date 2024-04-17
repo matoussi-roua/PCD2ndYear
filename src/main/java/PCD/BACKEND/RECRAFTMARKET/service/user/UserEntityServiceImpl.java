@@ -7,12 +7,14 @@ import PCD.BACKEND.RECRAFTMARKET.exceptions.ResourceNotFoundException;
 import PCD.BACKEND.RECRAFTMARKET.model.file.FileDataUser;
 import PCD.BACKEND.RECRAFTMARKET.model.product.Comment;
 import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
+import PCD.BACKEND.RECRAFTMARKET.model.role.Role;
 import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
 import PCD.BACKEND.RECRAFTMARKET.repository.CommentRepository;
 import PCD.BACKEND.RECRAFTMARKET.repository.UserEntityRepository;
 import PCD.BACKEND.RECRAFTMARKET.security.utility.ResponseHandler;
 import PCD.BACKEND.RECRAFTMARKET.service.file.FileServiceUser;
 import PCD.BACKEND.RECRAFTMARKET.service.product.ProductService;
+import PCD.BACKEND.RECRAFTMARKET.service.role.RoleService;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -39,6 +40,7 @@ public class UserEntityServiceImpl implements UserEntityService{
     private final FileServiceUser fileService;
     private final ProductService productService;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
 
     ///////////////////////////To DTO ////////////////////////
@@ -475,6 +477,42 @@ public ResponseEntity<Object> shopnow(UserDetails userDetails, UUID userId, Long
     return ResponseHandler.generateResponse("great! your points are increasing",HttpStatus.OK);
 }
 
+//////////////////////status sold or for sell//////////////////////////////
+@Override
+public ResponseEntity<Object> changeStatus(UserDetails userDetails, UUID userId, Long productId) {
+    final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+    if (!currentUser.getId().equals(userId)) {
+        return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+    }
+    final Product product= productService.getProductById(productId);
+    if( product.getPublisher().equals(currentUser)){
+        //product.setSold(!product.isSold());
+        productService.changeStatus(productId);
+        return ResponseHandler.generateResponse("status changed",HttpStatus.OK);
+    };
+    return ResponseHandler.generateResponse("product not found",HttpStatus.NOT_FOUND);
+}
+
+    @Override
+    public boolean adminExists() {
+        return userEntityRepository.existsUserEntityByUsername("admin@recraftmarket.com");
+    }
+@Override
+    public void createAdmin() {
+    Role role = roleService.getRoleByName("ADMIN");
+    if (!adminExists()) {
+            UserEntity admin = new UserEntity();
+            admin.setFirstname("admin");
+            admin.setLastname("admin");
+            admin.setUsername("admin@recraftmarket.com");
+            admin.setRole(role);
+            // Set other properties of the admin user as needed
+            // For example:
+            admin.setPassword(passwordEncoder.encode("adminPasswordRecraftMarket"));
+            // Save the admin user to the database
+            userEntityRepository.save(admin);
+        }
+    }
 
     ///////////////////////////////////////////////important/////////////////////////////////
 
@@ -483,7 +521,15 @@ public ResponseEntity<Object> shopnow(UserDetails userDetails, UUID userId, Long
                 () -> new ResourceNotFoundException("The User with ID %s could not be found in our system.".formatted(userId))
         );
     }
+@Override
+public ResponseEntity<Object> getUserByIdAuthorized(UserDetails userDetails, UUID userId){
+    final UserEntity currentUser=getUserByUsername(userDetails.getUsername());
+    if (!currentUser.getId().equals(userId)) {
+        return ResponseHandler.generateResponse("You are unauthorized", HttpStatus.UNAUTHORIZED);
+    }
 
+    return ResponseHandler.generateResponse(currentUser,HttpStatus.OK);
+}
     @Override
     public UserEntity getUserByUsername(String username) {
         return userEntityRepository.fetchUserWithUsername(username).orElseThrow(

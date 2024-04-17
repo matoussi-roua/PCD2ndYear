@@ -34,6 +34,7 @@ public class Product {
     //totalPoints = likesPoints + wishListPoints + shopPoints + commentsPoints
     private Long points = 0L;
     private boolean isDone; // the product is sold or not
+    private boolean sold;
     private String materials;
     private String Status;
     // @ElementCollection(fetch = FetchType.LAZY)
@@ -44,7 +45,7 @@ public class Product {
 
 
     @OneToMany(mappedBy = "product")
-    @JsonIgnore
+   // @JsonIgnore
     private List<FileData> filesProduct;
 
     @ManyToOne

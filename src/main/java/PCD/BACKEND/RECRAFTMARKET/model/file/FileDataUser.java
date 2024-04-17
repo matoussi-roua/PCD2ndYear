@@ -2,6 +2,7 @@ package PCD.BACKEND.RECRAFTMARKET.model.file;
 
 import PCD.BACKEND.RECRAFTMARKET.model.product.Product;
 import PCD.BACKEND.RECRAFTMARKET.model.user.UserEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,6 +38,7 @@ public class FileDataUser {
 
 
         @OneToOne
+        @JsonIgnore
         @JoinColumn(name = "idUser", referencedColumnName = "id")
         private UserEntity userFile;
 

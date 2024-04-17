@@ -39,4 +39,6 @@ public interface ProductService {
 
     //////////////this for admin ;updating points of all products////////////////////
     void updatePointsAllProduct();
+
+    void changeStatus(Long productId);
 }
