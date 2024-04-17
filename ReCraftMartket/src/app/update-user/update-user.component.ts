@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Users } from '../models/users';
+import { UserEntity } from '../models/user_entity';
 import { UsersService } from '../services/users.service';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 
@@ -9,7 +9,7 @@ import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms'
   styleUrl: './update-user.component.css'
 })
 export class UpdateUserComponent implements OnInit {
-  selectedUser: Users = new Users;
+  selectedUser: UserEntity = new UserEntity;
   updateUserForm: FormGroup = this.formBuilder.group({});
 
   //formReady:boolean = false;
