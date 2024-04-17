@@ -1,7 +1,7 @@
 import { UsersService } from './../services/users.service';
 import { Component, OnInit } from '@angular/core';
 
-import { Users } from '../models/users';
+import { UserEntity } from '../models/user_entity';
 
 
 @Component({
