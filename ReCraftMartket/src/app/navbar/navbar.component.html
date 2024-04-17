@@ -1,0 +1,64 @@
+<nav class="navbar navbar-expand-lg ">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img src="/assets/images/logo.png" alt="ReCraftMarket"  class="img"
+        style="width: 50%" />
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03"
+      aria-controls="navbarTogglerDemo03 navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+      <div class="input-group mb-3">
+
+      <input type="text" class="form-control" aria-label="Text input with dropdown button" placeholder="Search" />
+        <button class="btn submit" type="button" aria-expanded="false">
+          Submit
+        </button>
+      </div>
+
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/home">
+            <i class="fa fa-home fa-lg"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/addproduct">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle-fill" viewBox="0 0 16 16">
+                  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3z"/>
+                </svg> Add Post
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/topcustomer">
+            <i class="fa fa-trophy fa-lg"></i> Leaderboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/chat">
+            <i class="fa fa-bell fa-lg"></i> Notification
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/chat">
+            <i class="fa fa-envelope fa-lg"></i> Messages
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <i class="fa fa-circle"></i> Account
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" routerLink="/profile"><i class="fa fa-user fa-sm"></i> Profile</a></li>
+            <li><a class="dropdown-item" routerLink="/home"><i class="fa fa-arrow-circle-right"></i> Log Out</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#"><i class="fa fa-question"></i> Help</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

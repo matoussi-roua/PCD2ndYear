@@ -1,0 +1,167 @@
+<app-navbar></app-navbar>
+<app-sidebar></app-sidebar>
+<div class="container">
+  <div class="profile">
+    <div class="profile-header">
+      <div class="profile-header-cover"></div>
+      <div class="profile-header-content">
+        <div class="profile-header-img">
+          <img
+            src="https://bootdey.com/img/Content/avatar/avatar8.png"
+            alt=""
+          />
+        </div>
+
+        <ul class="profile-header-tab nav nav-tabs nav-tabs-v2">
+          <li class="nav-item">
+            <a routerLink="" class="nav-link" data-toggle="tab">
+              <div class="nav-field"></div>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="" class="nav-link" data-toggle="tab">
+              <div class="nav-field"></div>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/recentpost" class="nav-link" data-toggle="tab">
+              <div class="nav-field">Posts</div>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="#profile-media" class="nav-link" data-toggle="tab">
+              <div class="nav-field">Favourite</div>
+              <!--<div class="nav-value">356</div>-->
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/addproduct" class="nav-link" data-toggle="tab">
+              <div class="nav-field">Add Post</div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-plus-circle"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"
+                />
+                <path
+                  d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"
+                />
+              </svg>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/chat" class="nav-link" data-toggle="tab">
+              <div class="nav-field">notifications</div>
+              <!--<div class="nav-value">12</div>-->
+            </a>
+          </li>
+
+          <!--<li class="nav-item">-->
+          <!--<a href="#profile-followers" class="nav-link" data-toggle="tab">
+                        <!--<div class="nav-field">Followers</div>
+                  <!--<small class="text-muted">
+              <!-- <i class="fas fa-user mr-1"></i>Followers</small>-->
+          <!--  <div class="nav-value">152</div>
+                <!-- </a>
+                    <!--</li>-->
+          <!--<li class="nav-item">
+                    <a href="#profile-followers" class="nav-link" data-toggle="tab">
+                          <div class="nav-field">Following</div>
+
+          <div class="nav-value">262</div>
+          </a>
+      </li>-->
+          <li class="nav-item">
+            <a routerLink="/leaderboard" class="nav-link" data-toggle="tab">
+              <div class="nav-field">Leaderboad</div>
+              <!--<div class="nav-value">1.3m</div>-->
+            </a>
+          </li>
+          <!--<li class="nav-item">
+        <a routerLink="/topcustomer" class="nav-link" data-toggle="tab">
+          <div class="nav-field">Top Customers</div>
+
+        </a>
+      </li>-->
+        </ul>
+      </div>
+    </div>
+
+    <div class="profile-container">
+      <div class="profile-sidebar">
+        <div class="desktop-sticky-top">
+          <h4>John Smith</h4>
+          <div class="font-weight-600 mb-3 text-muted mt-n2"></div>
+          <div>
+            <p class="text-muted mb-2 fw-medium">
+              <i class="mdi mdi-email-outline me-2"></i
+              >slimeneya79&#64;gmail.com
+            </p>
+            <p class="text-muted fw-medium mb-0">
+              <i class="mdi mdi-phone-in-talk-outline me-2"></i>+216 21 471 xxx
+            </p>
+          </div>
+          <div class="mb-1">
+            <i class="fa fa-map-marker-alt fa-fw text-muted"></i> Manouba
+          </div>
+
+          <button class="btn" type="button" routerLink="/update">
+            Edit Profile
+          </button>
+          <hr class="mt-4 mb-4" />
+        </div>
+      </div>
+
+      <div class="profile-content">
+        <div class="row">
+          <div class="col-xl-12">
+            <div class="tab-content p-0">
+              <div
+                class="d-flex align-items-center justify-content-between mb-3"
+              >
+                <h5 class="mb-0">Recent posts</h5>
+                <a href="#" class="btn btn-link text-muted">Show all</a>
+              </div>
+              <div class="row">
+                <div class="col-lg-6 mb-2 pr-lg-1">
+                  <img
+                    src=" assets/images/profile3.jpg"
+                    alt=""
+                    class="img-fluid rounded shadow-sm"
+                  />
+                </div>
+                <div class="col-lg-6 mb-2 pl-lg-1">
+                  <img
+                    src="https://images.unsplash.com/photo-1475724017904-b712052c192a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80"
+                    alt=""
+                    class="img-fluid rounded shadow-sm"
+                  />
+                </div>
+                <div class="col-lg-6 pr-lg-1 mb-2">
+                  <img
+                    src="https://images.unsplash.com/photo-1453791052107-5c843da62d97?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
+                    alt=""
+                    class="img-fluid rounded shadow-sm"
+                  />
+                </div>
+                <div class="col-lg-6 pl-lg-1">
+                  <img
+                    src="https://images.unsplash.com/photo-1475724017904-b712052c192a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80"
+                    alt=""
+                    class="img-fluid rounded shadow-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

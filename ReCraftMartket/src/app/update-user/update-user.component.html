@@ -1,0 +1,136 @@
+<p>update-user works!</p>
+<section class="articles">
+<form [formGroup]="updateUserForm" *ngIf="updateUserForm" (ngSubmit)="onSubmit()" class="update-user-form">
+    <div>
+      <div class=" text-black">
+        <h3>Update User</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-group row d-flex justify-content-center align-items-center">
+                <label for="firstname" class="col-form-label col-sm-2 text-right">firstname:</label>
+    <div class="col-sm-5">
+        <input type="text" class="form-control" name="firstname" formControlName="firstname"/>
+        <div *ngIf="formErrors['firstname']" class="alert alert-danger">
+            {{ formErrors['firstname'] }}
+        </div>
+    </div>
+</div>
+<br>
+<div class="form-group row d-flex justify-content-center align-items-center">
+    <label for="email" class="col-form-label col-sm-2 text-right">Email:</label>
+    <div class="col-sm-5">
+        <input type="text" class="form-control" name="email" formControlName="email" />
+        <!--<div *ngIf="formErrors['email']" class="alert alert-danger">
+            {{ formErrors['email'] }} </div>-->
+              <span style="color:red;" *ngIf="updateUserForm.get('email')?.errors?.['required'] && updateUserForm.get('email')?.touched">email input field is not valid</span>
+
+
+    </div>
+</div>
+<br>
+
+        <div class="form-group row d-flex justify-content-center align-items-center">
+          <label for="lastname" class="col-form-label col-sm-2 text-right">lastname:</label>
+          <div class="col-sm-5">
+        <input type="text" class="form-control" name="lastname" formControlName="lastname" />
+        <div *ngIf="formErrors['lastname']" class="alert alert-danger">
+            {{ formErrors['lastname'] }}
+        </div>
+          </div>
+        </div>
+        <br>
+        <div class="form-group row d-flex justify-content-center align-items-center">
+            <label for="address" class="col-form-label col-sm-2 text-right">Adress:</label>
+      <div class="col-sm-5">
+
+        <input type="text" class="form-control" name="address" formControlName="address" />
+        <!--<div *ngIf="formErrors['address']" class="alert alert-danger">
+            {{ formErrors['address'] }}
+                </div>-->
+              <span style="color:red;" *ngIf="updateUserForm.get('address')?.errors?.['required'] && updateUserForm.get('address')?.touched">Address input field is not valid</span>
+            </div>
+        </div>
+      </div>
+      <br>
+      <br>
+      <div class="card-footer">
+        <button [disabled]="!updateUserForm.valid" class="btn btn-primary mr-2" type="submit">Update</button>
+        <button class="btn btn-danger mr-2" id="update-user-modal-close" type="button" routerLink="/profile">Cancel</button>
+      </div>
+    </div>
+  </form>
+  </section>
+
+
+  <!--
+<div class="container bootstrap snippets bootdey">
+    <h1 class="text-primary">Edit Profile</h1>
+      <hr>
+	<div class="row">
+      !-- left column --
+      <div class="col-md-3">
+        <div class="text-center">
+          <img src="https://bootdey.com/img/Content/avatar/avatar7.png" class="avatar img-circle img-thumbnail" alt="avatar">
+          <h6>Upload a different photo...</h6>
+
+          <input type="file" class="form-control">
+        </div>
+      </div>
+
+      !-- edit form column --
+      <div class="col-md-9 personal-info">
+        <div class="alert alert-info alert-dismissable">
+          <a class="panel-close close" data-dismiss="alert">×</a>
+          <i class="fa fa-coffee"></i>
+          This is an <strong>.alert</strong>. Use this to show important messages to the user.
+        </div>
+        <h3>Personal info</h3>
+
+        <form class="form-horizontal" role="form">
+          <div class="form-group">
+            <label class="col-lg-3 control-label">First name:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="dey-dey">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Last name:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="bootdey">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Company:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Email:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" value="janesemail@gmail.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Time Zone:</label>
+            <div class="col-lg-8">
+              <div class="ui-select">
+                <select id="user_time_zone" class="form-control">
+                  <option value="Hawaii">(GMT-10:00) Hawaii</option>
+                  <option value="Alaska">(GMT-09:00) Alaska</option>
+                  <option value="Pacific Time (US &amp; Canada)">(GMT-08:00) Pacific Time (US &amp; Canada)</option>
+                  <option value="Arizona">(GMT-07:00) Arizona</option>
+                  <option value="Mountain Time (US &amp; Canada)">(GMT-07:00) Mountain Time (US &amp; Canada)</option>
+                  <option value="Central Time (US &amp; Canada)" selected="selected">(GMT-06:00) Central Time (US &amp; Canada)</option>
+                  <option value="Eastern Time (US &amp; Canada)">(GMT-05:00) Eastern Time (US &amp; Canada)</option>
+                  <option value="Indiana (East)">(GMT-05:00) Indiana (East)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+  </div>
+</div>
+<hr>
+-->

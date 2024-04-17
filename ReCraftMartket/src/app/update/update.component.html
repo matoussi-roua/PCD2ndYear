@@ -1,0 +1,122 @@
+<app-navbar></app-navbar>
+<app-sidebar></app-sidebar>
+<div class="body">
+<div class="container bootstrap snippets bootdey">
+ <div class="container">
+  <div class="header">
+    <h1 class="text-primary">Edit Profile</h1>
+    <button class="go-back" routerLink="/profile">Go Back</button>
+  </div>
+</div>
+
+
+  <hr>
+  <div class="row">
+    <!-- left column -->
+    <div class="col-md-3">
+      <div class="text-center">
+        <img src="https://bootdey.com/img/Content/avatar/avatar3.png" class="avatar img-circle img-thumbnail" alt="avatar">
+        <h6>Upload a different photo...</h6>
+        <input type="file" class="form-control">
+      </div>
+    </div>
+
+    <!-- edit form column -->
+    <div class="col-md-9 personal-info">
+      <h3>Personal info</h3>
+      <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+        <div class="form-group">
+          <label class="col-lg-3 control-label">First name:</label>
+          <div class="col-lg-8">
+            <input class="form-control" type="text" formControlName="firstName">
+            <div *ngIf="profileForm.get('firstName')?.invalid && (profileForm.get('firstName')?.dirty || profileForm.get('firstName')?.touched)" class="text-danger">
+              First name is required.
+            </div>
+          </div>
+        </div>
+<div class="form-group">
+            <label class="col-lg-3 control-label">Last name:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" formControlName="lastName">
+              <div *ngIf="profileForm.get('lastName')?.invalid && (profileForm.get('lastName')?.dirty || profileForm.get('lastName')?.touched)"
+                class="text-danger">
+                Last name is required.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Email:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="email" formControlName="email">
+              <div *ngIf="profileForm.get('email')?.invalid && (profileForm.get('email')?.dirty || profileForm.get('email')?.touched)"
+                class="text-danger">
+                Email is required and must be a valid email address.
+              </div>
+            </div>
+          </div>
+
+         <div class="form-group">
+  <label class="col-lg-3 control-label">Phone number:</label>
+  <div class="col-lg-8">
+    <input class="form-control" type="text" formControlName="phoneNumber" pattern="[0-9]{8}">
+    <div *ngIf="profileForm.get('phoneNumber')?.invalid && (profileForm.get('phoneNumber')?.dirty || profileForm.get('phoneNumber')?.touched)"
+         class="text-danger">
+      Phone number must contain exactly 8 digits.
+    </div>
+  </div>
+</div>
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Address:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="text" formControlName="address">
+            </div>
+          </div>
+
+
+          <div class="form-group">
+            <label class="col-lg-3 control-label">Old Password:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="password" formControlName="oldPassword">
+              <div *ngIf="profileForm.get('oldPassword')?.invalid && (profileForm.get('oldPassword')?.dirty || profileForm.get('oldPassword')?.touched)"
+                class="text-danger">
+                Old Password is required.
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-lg-3 control-label">New Password:</label>
+            <div class="col-lg-8">
+              <input class="form-control" type="password" formControlName="newPassword">
+              <div *ngIf="profileForm.get('newPassword')?.invalid && (profileForm.get('newPassword')?.dirty || profileForm.get('newPassword')?.touched)"
+                class="text-danger">
+                New Password is required and must be at least 6 characters long.
+              </div>
+            </div>
+          </div>
+<div class="form-group">
+  <label class="col-lg-3 control-label">Confirm Password:</label>
+  <div class="col-lg-8">
+    <input class="form-control" type="password" formControlName="confirmPassword">
+    <div *ngIf="profileForm.hasError('notSame') && (profileForm.get('confirmPassword')?.dirty || profileForm.get('confirmPassword')?.touched)"
+      class="text-danger">
+      Passwords do not match.
+    </div>
+  </div>
+</div>
+<br>
+
+        <div class="gap-3 d-md-flex justify-content-md-end text-center">
+         <!-- <button type="button" class="btn btn-danger btn-lg">Delete profile</button>-->
+         <button type="submit" class="btn btn-primary btn-lg" [disabled]="profileForm.invalid"(click)="promptForCurrentPassword()">Update profile</button>
+
+
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</div>

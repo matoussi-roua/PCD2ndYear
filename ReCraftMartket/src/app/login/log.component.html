@@ -1,0 +1,68 @@
+
+<div class="container">
+  <div class="welcome">
+    <div class="pinkbox">
+      <div class="signup nodisplay">
+        <h1>register</h1>
+
+      <form [formGroup]="SignupForm" (ngSubmit)="SignupUser()"autocomplete="off">
+            <input type="text" placeholder="username" formControlName="signupusername">
+            <span style="color:red;"*ngIf="signupusername && signupusername.invalid && signupusername.touched">User input field is not valid</span>
+
+            <input type="text" placeholder="adress"formControlName="adress">
+            <span style="color:red;"*ngIf="signupadress && signupadress.invalid && signupadress.touched">adress input field is not valid</span>
+
+            <input type="text" placeholder="phone number" formControlName="phonenumber">
+            <span style="color:red;"*ngIf="signupphonenumber && signupphonenumber.invalid && signupphonenumber.touched">Phone number input field is not valid</span>
+
+
+            <input type="password" placeholder="password" formControlName="signuppassword">
+            <span style="color:red;"*ngIf="signuppassword && signuppassword.invalid && signuppassword.touched">Password input field is not valid</span>
+
+            <input type="password" placeholder="confirm password" formControlName="confirmpassword">
+            <span style="color:red;"*ngIf="signupconf_password && signupconf_password.invalid && signupconf_password.touched">confirmPassword input field is not valid</span>
+
+
+          <button   [disabled]="SignupForm.invalid"class="button submit" >create account </button>
+        </form>
+      </div>
+      <div class="signin">
+        <h1>sign in</h1>
+        <form [formGroup]="loginForm" (ngSubmit)="loginUser()"class="more-padding" autocomplete="off">
+
+            <input type="text" placeholder="username" formControlName="loginusername">
+            <span style="color:red;"*ngIf="loginusername && loginusername.invalid && loginusername.touched">User input field is not valid</span>
+
+            <input type="password" placeholder="password" formControlName="loginpassword">
+            <span style="color:red;"*ngIf="loginpassword && loginpassword.invalid && loginpassword.touched">Password input field is not valid</span>
+
+          <div class="checkbox">
+            <input type="checkbox" id="remember" /><label for="remember">remember me</label>
+          </div>
+
+          <button [disabled]="loginForm.invalid" class="button submit">LogIn</button>
+        </form>
+
+      </div>
+    </div>
+    <div class="leftbox">
+      <h2 class="title"><span>ReCraft</span><br>Market</h2>
+     <!-- <p class="desc">pick your perfect <span>bouquet</span></p>-->
+      <p class="desc">Join the movement for a better future<br>
+      <span> Shop consciously ,<br>Create uniquely.</span></p>
+      <img class="flower smaller" src="https://image.ibb.co/d5X6pn/1357d638624297b.png" alt="1357d638624297b" border="0">
+      <p class="account">have an account?</p>
+      <button class="button" id="signin">login</button>
+    </div>
+    <div class="rightbox">
+      <h2 class="title"><span>ReCraft</span><br>Market</h2>
+        <p class="desc">Join the movement for a better future<br>
+      <span> Shop consciously ,<br>Create uniquely.</span></p>
+      <img class="flower" src="https://preview.ibb.co/jvu2Un/0057c1c1bab51a0.jpg" />
+      <p class="account">don't have an account?</p>
+      <button class="button" id="signup">sign up</button>
+    </div>
+  </div>
+</div>
+
+
