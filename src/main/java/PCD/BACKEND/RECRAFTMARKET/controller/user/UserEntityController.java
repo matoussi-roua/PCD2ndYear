@@ -53,7 +53,6 @@ public class UserEntityController {
     public ResponseEntity<Object> addImageToUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID id, @RequestParam("file") MultipartFile file)throws IOException{
         return userService.addImageToUser(userDetails,id,file);
     }
-    //worked
     //confidential
     @DeleteMapping(value = "/client/removeimage/{id}")
     public ResponseEntity<Object> removeImageFromUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID id ) throws IOException{
@@ -68,8 +67,6 @@ public class UserEntityController {
     ///this part about the relation between the user and his products
 
 
-
-    //worked
     //confidential OK
     @PutMapping(value = "/client/addproductuser/{id}")
     public ResponseEntity<Object> addProductToUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID id, @RequestBody Product product) {
@@ -82,20 +79,17 @@ public class UserEntityController {
     public ResponseEntity<Object> addImageToProductUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID iduser,@PathVariable Long idproduct,@RequestParam("file") MultipartFile image) throws IOException {
         return userService.addImageToProductUser(userDetails,iduser,idproduct,image);
     }
-    //worked
     //confidential OK
     @PutMapping(value = "/client/updateproductuser/{iduser}/{idproduct}")
     public ResponseEntity<Object> addProductToUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID iduser,@PathVariable Long idproduct,@RequestBody Product productupdated){
         return userService.updateProductUser(userDetails,iduser,idproduct,productupdated);
     }
-    //worked
     //confidential OK
     @DeleteMapping(value = "/client/deleteproductuser/{iduser}/{idproduct}")
     public ResponseEntity<Object> deleteProductFromUser(@AuthenticationPrincipal UserDetails userDetails,@PathVariable UUID iduser,@PathVariable Long idproduct)throws IOException{
 return userService.deleteProductFromUser(userDetails,iduser,idproduct);
     }
 
-    //worked
     @GetMapping(value = "/permit/allproductsuser/{id}")
     public ResponseEntity<Object> getAllProductsOfUser(@PathVariable UUID id){
         return userService.getAllProductsOfUser(id);
