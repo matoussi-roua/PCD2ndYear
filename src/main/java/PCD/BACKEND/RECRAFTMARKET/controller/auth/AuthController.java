@@ -41,7 +41,7 @@ public class AuthController {
         return authService.login(loginDto);
     }
 //this method of authentication
-@GetMapping("/logout1")
+@PostMapping("/logout1")
 public String logout (@AuthenticationPrincipal UserDetails userDetails){
 
     return authService.logout(userDetails);

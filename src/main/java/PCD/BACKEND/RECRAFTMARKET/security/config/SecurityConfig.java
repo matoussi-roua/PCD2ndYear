@@ -47,9 +47,11 @@ public class SecurityConfig {
 
                 .authorizeRequests()
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v2/users/**").permitAll()
-
-                .requestMatchers("/api/v3/products/**").permitAll()
+                .requestMatchers("/api/v2/users/permit/**").permitAll()
+            //    .requestMatchers("/api/v2/users/client/**").permitAll()
+                .requestMatchers("/api/v3/products/admin/**").hasAuthority("ADMIN")
+                .requestMatchers("/api/v3/products/permit/**").permitAll()
+                //.requestMatchers("/api/v3/products/**").permitAll()
 
                 .requestMatchers("/api/v1/test/**").hasAuthority("CLIENT")
 

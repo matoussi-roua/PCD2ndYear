@@ -52,13 +52,17 @@ private RoleRepository roleRepository;
         Role role = roleRepository.fetchRoleByName("CLIENT")
                 .orElseThrow(() -> new ResourceNotFoundException("Default role not found [CLIENT]."));
 
-        UserEntity user = new UserEntity();
-        user.setUsername(registerDto.getUsername());
-        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
-        user.setRole(role);
-        user.setAddress(registerDto.getAddress());
-        user.setPhonenumber(registerDto.getPhonenumber());
-        user.setPoints(0);
+        UserEntity user = UserEntity
+                .builder()
+                .username(registerDto.getUsername())
+                .firstname(registerDto.getFirstname())
+                .lastname(registerDto.getLastname())
+                .password(passwordEncoder.encode(registerDto.getPassword()))
+                .role(role)
+                .address(registerDto.getAddress())
+                .phonenumber(registerDto.getPhonenumber())
+                .points(0L)
+                .build();
 
         UserEntity savedUser = userEntityRepository.save(user);
         String jwtToken = jwtService.generateToken(user);
