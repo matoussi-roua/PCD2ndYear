@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn, ValidationErrors } from '@angular/forms';
-import { AbstractControl} from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { AbstractControl } from '@angular/forms';
 
-
-
-
-
+import { UserEntity } from '../models/user_entity';
+import { UsersService } from '../services/users.service';
+import { AuthService } from '../services/auth-service.service';
 // Custom validator to check if new password and confirm password match
 export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const newPassword = control.get('newPassword');
@@ -24,27 +22,33 @@ export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): V
 @Component({
   selector: 'app-update',
   templateUrl: './update.component.html',
-  styleUrl: './update.component.css'
+  styleUrls: ['./update.component.css']
 })
-
-export class UpdateComponent implements  OnInit {
+export class UpdateComponent implements OnInit {
   profileForm!: FormGroup;
+  user: UserEntity = new UserEntity();
 
-  constructor(private formBuilder: FormBuilder) {}
-
-  ngOnInit() {
+  constructor(private formBuilder: FormBuilder, private userService: UsersService, private authService: AuthService ) {}
+ngOnInit() {
+    // Fetch user data from backend by ID
+    const userId = this.authService.getCurrentUser().id;/*!!!!!!!!! */
+    this.userService.getUserById(userId).subscribe((userData: UserEntity) => {
+      this.user = userData;
+      this.initializeForm();
+    });
+  }
+  initializeForm() {
     // Initialize the form with validators
     this.profileForm = this.formBuilder.group({
-    firstName: ['eya',Validators.required ],
-      lastName: ['slimen', Validators.required],
-      email: ['exemlpe@gmail.com', [Validators.required, Validators.email]],
-     phoneNumber: ['21345678', [Validators.required, Validators.pattern(/^\d{8}$/)]],
-      address: ['Monastir'],
+      firstName: [this.user.firstname, Validators.required],
+      lastName: [this.user.lastname, Validators.required],
+      email: [this.user.username, [Validators.required, Validators.email]],
+      phoneNumber: [this.user.phonenumber, [Validators.required, Validators.pattern(/^\d{8}$/)]],
+      address: [this.user.address],
       oldPassword: ['', Validators.required],
-       newPassword: ['',  Validators.minLength(6)],
-    confirmPassword: ['']
-  }, { validators: passwordMatchValidator });
-
+      newPassword: ['', Validators.minLength(6)],
+      confirmPassword: ['']
+    }, { validators: passwordMatchValidator });
   }
 
   updateProfile() {
@@ -53,7 +57,6 @@ export class UpdateComponent implements  OnInit {
       console.log('Profile updated successfully!');
       console.warn(this.profileForm.value);
     } else {
-
       console.log('Form is invalid. Please check your input.');
     }
   }
@@ -63,12 +66,10 @@ export class UpdateComponent implements  OnInit {
     if (confirmed) {
       this.updateProfile();
     } else {
-
       console.log('Update cancelled.');
     }
   }
 
-  // Function to handle password change
   changePassword() {
     if (this.profileForm.controls['oldPassword'].valid &&
         this.profileForm.controls['newPassword'].valid &&
@@ -76,14 +77,11 @@ export class UpdateComponent implements  OnInit {
       // Perform password change logic
       console.log('Password changed successfully!');
     } else {
-      // Password form fields are invalid, handle accordingly
       console.log('Password form fields are invalid.');
     }
   }
 
-
   deleteProfile() {
-
     console.log('Profile deleted successfully!');
   }
 }
