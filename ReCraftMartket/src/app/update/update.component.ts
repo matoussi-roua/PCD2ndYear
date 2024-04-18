@@ -31,8 +31,9 @@ export class UpdateComponent implements OnInit {
   constructor(private formBuilder: FormBuilder, private userService: UsersService, private authService: AuthService ) {}
 ngOnInit() {
     // Fetch user data from backend by ID
-    const userId = this.authService.getCurrentUser().id;/*!!!!!!!!! */
-    this.userService.getUserById(userId).subscribe((userData: UserEntity) => {
+   // const userId = this.authService.getCurrentUser().id;/*!!!!!!!!! */
+   const userId ='1';
+   this.userService.getUserById(userId).subscribe((userData: UserEntity) => {
       this.user = userData;
       this.initializeForm();
     });
