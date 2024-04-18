@@ -2,7 +2,7 @@ import { environment } from './../../environments/environment.development';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Product } from '../models/product';
+import { Product } from '../models/product/product';
 
 
 @Injectable({

@@ -1,5 +1,5 @@
-import { FileDataUser } from "./file-data-user";
-import { Role } from "./role";
+import { FileDataUser } from "../files/file-data-user";
+import { Role } from "../role/role";
 
 export class UserEntity {
    id!: string;
