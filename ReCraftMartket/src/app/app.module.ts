@@ -32,6 +32,9 @@ import { HomeComponent } from './home/home.component';
 import { Navbar2Component } from './navbar2/navbar2.component';
 import { AboutComponent } from './about/about.component';
 import { FooterComponent } from './footer/footer.component';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'; //i added httpinterceptors and httpclient 
+import { AuthInterceptor } from './interceptors/auth-interceptor';
+
 /*login */
 @NgModule({
   declarations: [
@@ -66,9 +69,15 @@ import { FooterComponent } from './footer/footer.component';
      MatInputModule,
      ReactiveFormsModule,
       MatDialogModule,
-     MatIconModule
+     MatIconModule,
+     HttpClientModule //i added httpclientmodule
   ],
   providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true // Set to true to allow multiple interceptors
+    },
     provideClientHydration(),
     provideAnimationsAsync()
   ],

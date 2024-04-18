@@ -4,8 +4,6 @@ import { UserEntity } from '../models/user_entity';
 import { Observable } from 'rxjs';
 
 
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -23,6 +21,7 @@ export class UsersService {
   getUsers(): Observable<UserEntity[]> {
     return this.httpclient.get<UserEntity[]>("https://jsonplaceholder.typicode.com/users");
   }
+
 
 getUserById(id: string): Observable<UserEntity> {
   return this.httpclient.get<UserEntity>(`${this.apiUrl}/users/${id}`);
