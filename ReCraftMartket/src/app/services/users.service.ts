@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Users } from '../models/user_entity';
+import { UserEntity } from '../models/user_entity';
 import { Observable } from 'rxjs';
 /*
 @Injectable({
@@ -11,20 +11,20 @@ export class UsersService {
     constructor(private httpclient: HttpClient) { }
 
 
-createUser(user: Users): Observable<Users> {
-  return this.httpclient.post<Users>(`${environment.apiUrl}/users`, user);
+createUser(user: UserEntity): Observable<UserEntity> {
+  return this.httpclient.post<UserEntity>(`${environment.apiUrl}/users`, user);
 }
 
-getUsers(): Observable<Users[]> {
-  return this.httpclient.get<Users[]>(`${environment.apiUrl}/users`);
+getUsers(): Observable<UserEntity[]> {
+  return this.httpclient.get<UserEntity[]>(`${environment.apiUrl}/users`);
 }
 
-getUserById(id: number): Observable<Users> {
-  return this.httpclient.get<Users>(`${environment.apiUrl}/users/${id}`);
+getUserById(id: number): Observable<UserEntity> {
+  return this.httpclient.get<UserEntity>(`${environment.apiUrl}/users/${id}`);
 }
 /*a verifier*
-updateUserProfile(user: Users): Observable<Users> {
-  return this.httpclient.put<Users>(`${environment.apiUrl}/users/${user.id}`, user);
+updateUserProfile(user: UserEntity): Observable<UserEntity> {
+  return this.httpclient.put<UserEntity>(`${environment.apiUrl}/users/${user.id}`, user);
 }
 
 }*/
@@ -38,15 +38,15 @@ export class UsersService {
 
   constructor(private http: HttpClient) { }
 
-  getUsers(): Observable<Users[]> {
-    return this.http.get<Users[]>(this.apiUrl);
+  getUsers(): Observable<UserEntity[]> {
+    return this.http.get<UserEntity[]>(this.apiUrl);
   }
 
-  addUser(user: Users): Observable<Users> {
-    return this.http.post<Users>(this.apiUrl, user);
+  addUser(user: UserEntity): Observable<UserEntity> {
+    return this.http.post<UserEntity>(this.apiUrl, user);
   }
 
-  updateUserProfile(user: Users): Observable<any> {
+  updateUserProfile(user: UserEntity): Observable<any> {
     const url = `${this.apiUrl}/${user.id}`;
     return this.http.put(url, user);
   }
@@ -75,19 +75,19 @@ export class UsersService {
 
 
 
-  getUsers(): Observable<Users[]> {
-    return this.httpclient.get<Users[]>("https://jsonplaceholder.typicode.com/users");
+  getUsers(): Observable<UserEntity[]> {
+    return this.httpclient.get<UserEntity[]>("https://jsonplaceholder.typicode.com/users");
   }
 
-getUserById(id: number): Observable<Users> {
-  return this.httpclient.get<Users>(`${this.apiUrl}/users/${id}`);
+getUserById(id: number): Observable<UserEntity> {
+  return this.httpclient.get<UserEntity>(`${this.apiUrl}/users/${id}`);
 }
 
-  addUser(user: Users): Observable<Users> {
-    return this.httpclient.post<Users>(this.apiUrl, user);
+  addUser(user: UserEntity): Observable<UserEntity> {
+    return this.httpclient.post<UserEntity>(this.apiUrl, user);
   }
 
-    updateUser(user: Users): Observable<any> {
+    updateUser(user: UserEntity): Observable<any> {
     return this.httpclient.put(`${this.apiUrl}/${user.id}`, user);
   }}
 
