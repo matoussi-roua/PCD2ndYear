@@ -2,9 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn, ValidationErrors } from '@angular/forms';
 import { AbstractControl } from '@angular/forms';
 
-import { UserEntity } from '../models/user_entity';
+import { UserEntity } from '../models/user/user_entity';
 import { UsersService } from '../services/users.service';
-import { AuthService } from '../services/auth-service.service';
 // Custom validator to check if new password and confirm password match
 export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   const newPassword = control.get('newPassword');
@@ -28,10 +27,11 @@ export class UpdateComponent implements OnInit {
   profileForm!: FormGroup;
   user: UserEntity = new UserEntity();
 
-  constructor(private formBuilder: FormBuilder, private userService: UsersService, private authService: AuthService ) {}
+  constructor(private formBuilder: FormBuilder, private userService: UsersService ) {}
 ngOnInit() {
     // Fetch user data from backend by ID
-    const userId = this.authService.getCurrentUser().id;/*!!!!!!!!! */
+    //const userId = this.authService.getCurrentUser().id;/*!!!!!!!!! */
+    const userId='1';
     this.userService.getUserById(userId).subscribe((userData: UserEntity) => {
       this.user = userData;
       this.initializeForm();
