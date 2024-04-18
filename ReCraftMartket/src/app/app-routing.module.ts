@@ -16,7 +16,6 @@ import { TopcustomerComponent } from './topcustomer/topcustomer.component';
 import { DetailsComponent } from './details/details.component';
 import { CommentsComponent } from './comments/comments.component';
 import { LogComponent } from './login/log.component';
-import { UpdateUserComponent } from './update-user/update-user.component';
 import { UpdateComponent } from './update/update.component';
 import { HomeComponent } from './home/home.component';
 import { Navbar2Component } from './navbar2/navbar2.component';
@@ -36,7 +35,6 @@ const routes: Routes = [
   {path:"dashboard",component:DashboardComponent},
   {path:"chat",component:ChatComponent},
   {path:"cardproduct",component:CardproductComponent},
-   {path:"updateuser",component:UpdateUserComponent},
    {path:"leaderboard",component:LeaderboardComponent},
    {path:"topcustomer",component:TopcustomerComponent},
    {path:"details",component:DetailsComponent},
