@@ -21,8 +21,8 @@ export const passwordMatchValidator: ValidatorFn = (control: AbstractControl): V
 
 @Component({
   selector: 'app-update',
-  templateUrl: './update.component.html',
-  styleUrls: ['./update.component.css']
+  templateUrl: './updateuser.component.html',
+  styleUrls: ['./updateuser.component.css']
 })
 export class UpdateComponent implements OnInit {
   profileForm!: FormGroup;

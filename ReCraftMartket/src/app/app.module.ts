@@ -25,7 +25,7 @@ import { MatIconModule } from '@angular/material/icon';
 import{MatInputModule} from '@angular/material/input';
 import{ReactiveFormsModule} from '@angular/forms';
 
-import { UpdateComponent } from './update/update.component';
+import { UpdateComponent } from './update_user/updateuser.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 import { HomeComponent } from './home/home.component';

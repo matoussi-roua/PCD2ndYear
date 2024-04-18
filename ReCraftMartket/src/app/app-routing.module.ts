@@ -16,7 +16,7 @@ import { TopcustomerComponent } from './topcustomer/topcustomer.component';
 import { DetailsComponent } from './details/details.component';
 import { CommentsComponent } from './comments/comments.component';
 import { LogComponent } from './login/log.component';
-import { UpdateComponent } from './update/update.component';
+import { UpdateComponent } from './update_user/updateuser.component';
 import { HomeComponent } from './home/home.component';
 import { Navbar2Component } from './navbar2/navbar2.component';
 import { FooterComponent } from './footer/footer.component';
