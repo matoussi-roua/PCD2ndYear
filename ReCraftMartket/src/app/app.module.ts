@@ -24,7 +24,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import{MatInputModule} from '@angular/material/input';
 import{ReactiveFormsModule} from '@angular/forms';
-import { UpdateUserComponent } from './update-user/update-user.component';
 import { UpdateComponent } from './update/update.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
@@ -52,7 +51,6 @@ import { AuthInterceptor } from './interceptors/auth-interceptor';
     CommentsComponent,
     LogComponent,
     AddproductComponent,
-    UpdateUserComponent,
     UpdateComponent,
     HomeComponent,
     Navbar2Component,
